@@ -55,7 +55,7 @@ fclose($socket);
  */
 function onOpen($connect, $b) {
     var_dump('connection opened');
-    fwrite($connect, (new WebSocket($connect))->encode('Привет'));
+//    fwrite($connect, (new WebSocket($connect))->encode('Привет'));
 }
 
 function onClose($a) {
@@ -68,5 +68,8 @@ function onClose($a) {
  */
 function onMessage($connect, $data) {
     var_dump('Someone Came');
-    echo (new WebSocket($connect))->decode($data)['payload'] . "\n";
+//    echo (new WebSocket($connect))->decode($data)['payload'] . "\n"; может для следующих версий
+    $message = (new WebSocket($connect))->decode($data)['payload'];
+    $encmessage = (new WebSocket($connect))->encode($message);
+    fwrite($connect, $encmessage);
 }
