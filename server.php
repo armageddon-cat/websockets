@@ -26,8 +26,7 @@ while (true) {
     if (in_array($socket, $read)) {//есть новое соединение
         //принимаем новое соединение и производим рукопожатие:
         /** @var resource $connect */
-        $ws = new WebSocket($connect);
-        if (($connect = stream_socket_accept($socket, -1)) && $info = $ws->handshake()) {
+        if (($connect = stream_socket_accept($socket, -1)) && $info = (new WebSocket($connect))->handshake()) {
             $connects[] = $connect;//добавляем его в список необходимых для обработки
             onOpen($connect, $info);//вызываем пользовательский сценарий
         }
