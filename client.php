@@ -10,7 +10,7 @@ if (!$fp) {
     echo "$errstr ($errno)<br />\n";
 } else {
     echo "conn". "\n";
-    $contents = stream_get_contents($fp);
+    $contents = stream_get_contents($fp,10);
     echo $contents;
     fclose($fp);
 }
