@@ -8,15 +8,25 @@
 include_once __DIR__ . DIRECTORY_SEPARATOR . 'WebSocket.php';
 
 $socket = stream_socket_server('tcp://127.0.0.1:8000', $errno, $errstr);
-if (!$socket) {
-    echo "$errstr ($errno)<br />\n";
-} else {
-    while ($conn = stream_socket_accept($socket)) {
-        echo 'someone connected';
-        $ws = new WebSocket($conn);
-        $ws->handshake();
-        fwrite($conn, 'Local time ' . date('Y-m-d H:i:s') . "\n");
-        fclose($conn);
+$connects = array();
+while (true) {
+    //формируем массив прослушиваемых сокетов:
+    $read = $connects;
+    $read[] = $socket;
+    $write = $except = null;
+    
+    if (!stream_select($read, $write, $except, null)) {//ожидаем сокеты доступные для чтения (без таймаута)
+        break;
     }
-    fclose($socket);
+    
+    if (in_array($socket, $read)) {//есть новое соединение
+        $connect = stream_socket_accept($socket, -1);//принимаем новое соединение
+        $connects[] = $connect;//добавляем его в список необходимых для обработки
+        unset($read[ array_search($socket, $read) ]);
+    }
+    
+    foreach($read as $connect) {//обрабатываем все соединения
+        //...обрабатываем $connect
+        unset($connects[ array_search($connect, $connects) ]);
+    }
 }
