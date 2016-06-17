@@ -26,7 +26,8 @@ while (true) {
     if (in_array($socket, $read)) {//есть новое соединение
         //принимаем новое соединение и производим рукопожатие:
         /** @var resource $connect */
-        if (($connect = stream_socket_accept($socket, -1)) && $info = (new WebSocket($connect))->handshake()) {
+        $ws = new WebSocket($connect);
+        if (($connect = stream_socket_accept($socket, -1)) && $info = $ws->handshake()) {
             $connects[] = $connect;//добавляем его в список необходимых для обработки
             onOpen($connect, $info);//вызываем пользовательский сценарий
         }
@@ -55,6 +56,7 @@ fclose($socket);
  */
 function onOpen($connect, $b) {
     var_dump('connection opened');
+//    $ws = new WebSocket($connect);
 //    fwrite($connect, (new WebSocket($connect))->encode('Привет'));
 }
 
@@ -68,8 +70,9 @@ function onClose($a) {
  */
 function onMessage($connect, $data) {
     var_dump('Someone Came');
+    $ws = new WebSocket($connect);
 //    echo (new WebSocket($connect))->decode($data)['payload'] . "\n"; может для следующих версий
-    $message = (new WebSocket($connect))->decode($data)['payload'];
-    $encmessage = (new WebSocket($connect))->encode($message);
+    $decmessage = $ws->decode($data);
+    $encmessage = $ws->encode($decmessage['payload']);
     fwrite($connect, $encmessage);
 }
