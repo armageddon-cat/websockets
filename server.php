@@ -41,9 +41,10 @@ while (true) {
             onClose($connect);//вызываем пользовательский сценарий
             continue;
         }
-    
-        onMessage($connect, $data);//вызываем пользовательский сценарий
-    
+
+        foreach ($connects as $currentConnect) {
+            onMessage($currentConnect, $data);//вызываем пользовательский сценарий
+        }
     }
 }
 
