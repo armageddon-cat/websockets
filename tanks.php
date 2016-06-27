@@ -54,14 +54,20 @@
                 console.log("not arrow");
                 return;
             }
-            socket.send(e.keyCode);
+            var tankData = {'d':e.keyCode,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
+            socket.send(JSON.stringify(tankData));
         });
 
         socket.onmessage = function (event) {
             tankLogic(event.data);
         };
-        
+        // on open должен вызвать tankLogic получив от сервера масив текущих танков. и проитерировать их все отрисовав
+        // вполне возможно нужно добавить флаг карент в джосон чтоб знак какие танки сдвинулись. пока не ясно
         function tankLogic(keyCode) {
+            keyCode =JSON.parse(keyCode);
+            IMAGE_OFFSET_X = keyCode.x;
+            IMAGE_OFFSET_Y = keyCode.y;
+            keyCode = keyCode.d;
             if (currentDirectionCode == keyCode) { // same direction
                 console.log("same direction");
                 moveTank(currentDirectionCode);
