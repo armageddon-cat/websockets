@@ -99,7 +99,7 @@
         // on open должен вызвать tankLogic получив от сервера масив текущих танков. и проитерировать их все отрисовав
         // вполне возможно нужно добавить флаг карент в джосон чтоб знак какие танки сдвинулись. пока не ясно
         function tankLogic(currentTankData, index, array) {
-            console.log("currentDirectionCodetankLogicStart"+currentDirectionCode);
+            console.log("currentDirectionCodetankLogicStart"+currentTankData.currentd);
 //            tankData = JSON.parse(tankData);
 //            IMAGE_OFFSET_X = currentTankData.x;
 //            IMAGE_OFFSET_Y = currentTankData.y;
@@ -113,13 +113,13 @@
 //            console.log(currentTankData); // TODO remove debug!!
 //            console.log(array); // TODO remove debug!!
 //            console.log(tankData); // TODO remove debug!!
-            console.log("currentDirectionCodetankLogicStartAfter"+currentDirectionCode);
+            console.log("currentDirectionCodetankLogicStartAfter"+currentTankData.currentd);
             console.log("before outside moveTank x" + IMAGE_OFFSET_X);
             console.log("before outside moveTank y" + IMAGE_OFFSET_Y);
             if (currentTankData.currentd == currentTankData.newd) { // same direction
                 console.log("same direction");
                 moveTank(currentTankData.currentd, currentTankData);
-                recalcTranslate();
+                recalcTranslate(currentTankData);
             }
 //            array[index].x=IMAGE_OFFSET_X;
 //            array[index].y=IMAGE_OFFSET_Y;
@@ -137,28 +137,28 @@
             if (currentTankData.newd == CODE_LEFT_ARROW) {
                 tankData[index].currentd = CODE_LEFT_ARROW;
                 currentDirection = DIRECTION_LEFT; // new current currentDirection
-                console.log("left pressed. currentDirection=" + currentDirection);
+                console.log("left pressed. currentDirection=" + currentTankData.currentd);
             }
             if (currentTankData.newd == CODE_UP_ARROW) {
                 canvasContext.rotate(ROTATE_CLOCKWISE);
                 console.log("up 90");
                 tankData[index].currentd = CODE_UP_ARROW;
                 currentDirection = DIRECTION_UP;
-                console.log("up pressed. currentDirection=" + currentDirection);
+                console.log("up pressed. currentDirection=" + currentTankData.currentd);
             }
             if (currentTankData.newd == CODE_RIGHT_ARROW) {
                 canvasContext.rotate(ROTATE_OPPOSITE);
                 console.log("right 180");
                 tankData[index].currentd = CODE_RIGHT_ARROW;
                 currentDirection = DIRECTION_RIGHT;
-                console.log("right pressed. currentDirection=" + currentDirection);
+                console.log("right pressed. currentDirection=" + currentTankData.currentd);
             }
             if (currentTankData.newd == CODE_DOWN_ARROW) {
                 canvasContext.rotate(ROTATE_COUNTERCLOCKWISE);
                 console.log("down 270");
                 tankData[index].currentd = CODE_DOWN_ARROW;
                 currentDirection = DIRECTION_DOWN;
-                console.log("down pressed. currentDirection=" + currentDirection);
+                console.log("down pressed. currentDirection=" + currentTankData.currentd);
             }
             canvasContext.translate(TRANSLATE_VALUE_NEGATIVE_X, TRANSLATE_VALUE_NEGATIVE_Y);
 //            canvasContext.fillStyle = "#4D4E53";
@@ -169,7 +169,7 @@
             canvasContext.restore();
 //            socket.send(JSON.stringify(tankData));
             console.log("keydown");
-            console.log("currentDirectionCodetankLogicEnd"+currentDirectionCode);
+            console.log("currentDirectionCodetankLogicEnd"+currentTankData.currentd);
         }
 
         function moveTank(currentDirectionCode, currentTankData) {
@@ -191,11 +191,11 @@
             }
         }
         
-        function recalcTranslate() {
-            TRANSLATE_VALUE_X = IMAGE_OFFSET_X+SIZE_IMAGE*0.5;
-            TRANSLATE_VALUE_Y = IMAGE_OFFSET_Y+SIZE_IMAGE*0.5;
-            TRANSLATE_VALUE_NEGATIVE_X = -(IMAGE_OFFSET_X+SIZE_IMAGE*0.5);
-            TRANSLATE_VALUE_NEGATIVE_Y = -(IMAGE_OFFSET_Y+SIZE_IMAGE*0.5);
+        function recalcTranslate(currentTankData) {
+            TRANSLATE_VALUE_X = currentTankData.x+SIZE_IMAGE*0.5;
+            TRANSLATE_VALUE_Y = currentTankData.y+SIZE_IMAGE*0.5;
+            TRANSLATE_VALUE_NEGATIVE_X = -(currentTankData.x+SIZE_IMAGE*0.5);
+            TRANSLATE_VALUE_NEGATIVE_Y = -(currentTankData.y+SIZE_IMAGE*0.5);
         }
 
         function createGuid()
