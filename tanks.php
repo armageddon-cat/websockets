@@ -35,7 +35,7 @@
         GUID = createGuid();
         
         var socket = new WebSocket("ws://185.154.13.92:8123");
-        tankDataSingle = {'id': GUID,'d':37,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
+        tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
         socket.onopen = function () {
             socket.send(JSON.stringify(tankDataSingle));
             console.log("socket opened v2");
@@ -58,13 +58,17 @@
                 console.log("not arrow");
                 return;
             }
-            tempTankData = {'id': GUID,'d':e.keyCode,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
+            console.log("currentDirectionCodetankLogickeydown"+currentDirectionCode);
+            console.log("IMAGE_OFFSET_XCodetankLogickeydown"+IMAGE_OFFSET_X);
+            console.log("IMAGE_OFFSET_YCodetankLogickeydown"+IMAGE_OFFSET_Y);
+            tempTankData = {'id': GUID,'currentd':currentDirectionCode,'newd':e.keyCode,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
             tankData.find(findTank);
             socket.send(JSON.stringify(tankData));
         });
 
         socket.onmessage = function (event) {
             console.log("someonecame"); // TODO remove debug!!
+            console.log("currentDirectionCodetankLogiconmessage"+currentDirectionCode);
             var data = JSON.parse(event.data);
             if (Array.isArray(data)) {
                 // existing user
@@ -76,10 +80,10 @@
                 tankData.push(JSON.parse(event.data));
             }
             canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
-            tankData.forEach(function(item) {
+            tankData.forEach(function(item, index, array) {
                 console.log("itemforEach"); // TODO remove debug!!
                 console.log(item); // TODO remove debug!!
-                tankLogic(item);
+                tankLogic(item, index, array);
             });
             console.log("tanksData"); // TODO remove debug!!
             console.log(tankData); // TODO remove debug!!
@@ -87,17 +91,23 @@
         };
         // on open должен вызвать tankLogic получив от сервера масив текущих танков. и проитерировать их все отрисовав
         // вполне возможно нужно добавить флаг карент в джосон чтоб знак какие танки сдвинулись. пока не ясно
-        function tankLogic(tankData) {
+        function tankLogic(tankData, index, array) {
+            console.log("currentDirectionCodetankLogicStart"+currentDirectionCode);
 //            tankData = JSON.parse(tankData);
             IMAGE_OFFSET_X = tankData.x;
             IMAGE_OFFSET_Y = tankData.y;
-            tankData = tankData.d;
+            currentDirectionCode = tankData.currentd;
+            tankData = tankData.newd;
+            console.log("currentDirectionCodetankLogicStartAfter"+currentDirectionCode);
+            console.log("before outside moveTank x" + IMAGE_OFFSET_X);
+            console.log("before outside moveTank y" + IMAGE_OFFSET_Y);
             if (currentDirectionCode == tankData) { // same direction
                 console.log("same direction");
                 moveTank(currentDirectionCode);
                 recalcTranslate();
             }
-    
+            array[index].x=IMAGE_OFFSET_X;
+            array[index].y=IMAGE_OFFSET_Y;
             console.log("outside moveTank x" + IMAGE_OFFSET_X);
             console.log("outside moveTank y" + IMAGE_OFFSET_Y);
 //            console.log("TRANSLATE_VALUE_X" + TRANSLATE_VALUE_X);
@@ -142,6 +152,7 @@
             canvasContext.restore();
 //            socket.send(JSON.stringify(tankData));
             console.log("keydown");
+            console.log("currentDirectionCodetankLogicEnd"+currentDirectionCode);
         }
 
         function moveTank(currentDirectionCode) {
@@ -180,7 +191,7 @@
 
         function findTank(element, index, array) {
             if (element.id == GUID) {
-                array[index] = tempTankData;
+                array[index].newd = tempTankData.newd;
                 return true;
             }
             return false;
