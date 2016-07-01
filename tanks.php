@@ -37,7 +37,7 @@
         TANK_STEP = 10;
         GUID = createGuid();
         
-        var socket = new WebSocket("ws://185.154.13.92:8123");
+        var socket = new WebSocket("ws://185.154.13.92:8124");
         tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'status':'initial','x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
         socket.onopen = function () {
             socket.send(JSON.stringify(tankDataSingle));
