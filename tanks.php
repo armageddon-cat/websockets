@@ -82,14 +82,15 @@
             }
             canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
             tankData.forEach(function(item, index, array) {
-                if (item.status == 'changed') {
-                    item.status = 'nochanges';
-                    console.log("itemforEach"); // TODO remove debug!!
-                    console.log(item); // TODO remove debug!!
-                    tankLogic(item, index, array);
-                } else {
-                    canvasContext.drawImage(img, item.x, item.y);
-                }
+//                if (item.status == 'changed') {
+//                    item.status = 'nochanges';
+//                    console.log("itemforEach"); // TODO remove debug!!
+//                    console.log(item); // TODO remove debug!!
+//                    tankLogic(item, index, array);
+//                } else {
+//                    canvasContext.drawImage(img, item.x, item.y);
+//                }
+                tankLogic(item, index, array);
                 console.log("itemforEachStatusNotChanged"); // TODO remove debug!!
             });
             console.log("tanksData"); // TODO remove debug!!
@@ -116,11 +117,13 @@
             console.log("currentDirectionCodetankLogicStartAfter"+currentTankData.currentd);
             console.log("before outside moveTank x" + IMAGE_OFFSET_X);
             console.log("before outside moveTank y" + IMAGE_OFFSET_Y);
-            if (currentTankData.currentd == currentTankData.newd) { // same direction
+            if (currentTankData.currentd == currentTankData.newd && currentTankData.status == 'changed') { // same direction
+                currentTankData.status = 'nochanges';
                 console.log("same direction");
                 moveTank(currentTankData.currentd, currentTankData);
-                recalcTranslate(currentTankData);
+                
             }
+            recalcTranslate(currentTankData);
 //            array[index].x=IMAGE_OFFSET_X;
 //            array[index].y=IMAGE_OFFSET_Y;
             console.log("outside moveTank x" + IMAGE_OFFSET_X);
