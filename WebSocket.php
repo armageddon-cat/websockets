@@ -1,5 +1,5 @@
 <?php
-
+namespace WebSocket;
 /**
  * Created by PhpStorm.
  * User: sera

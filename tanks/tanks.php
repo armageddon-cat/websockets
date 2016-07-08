@@ -117,12 +117,12 @@
             console.log("currentDirectionCodetankLogicStartAfter"+currentTankData.currentd);
             console.log("before outside moveTank x" + IMAGE_OFFSET_X);
             console.log("before outside moveTank y" + IMAGE_OFFSET_Y);
-            if (currentTankData.currentd == currentTankData.newd && currentTankData.status == 'changed') { // same direction
-                currentTankData.status = 'nochanges';
-                console.log("same direction");
-                moveTank(currentTankData.currentd, currentTankData);
-                
-            }
+//            if (currentTankData.currentd == currentTankData.newd && currentTankData.status == 'changed') { // same direction
+//                currentTankData.status = 'nochanges';
+//                console.log("same direction");
+//                moveTank(currentTankData.currentd, currentTankData);
+//
+//            }
             recalcTranslate(currentTankData);
 //            array[index].x=IMAGE_OFFSET_X;
 //            array[index].y=IMAGE_OFFSET_Y;

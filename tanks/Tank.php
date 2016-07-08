@@ -1,4 +1,7 @@
 <?php
+namespace Tanks;
+
+use stdClass;
 
 /**
  * Created by PhpStorm.

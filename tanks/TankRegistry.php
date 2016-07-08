@@ -1,4 +1,5 @@
 <?php
+namespace Tanks;
 /**
  * Created by PhpStorm.
  * User: sera

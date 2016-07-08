@@ -1,11 +1,13 @@
 <?php
+namespace Tanks;
+use WebSocket\WebSocket;
+require __DIR__ . '/../vendor/autoload.php';
 /**
  * Created by PhpStorm.
  * User: sera
  * Date: 20.06.2016
  * Time: 23:44
  */
-include_once __DIR__ . DIRECTORY_SEPARATOR . 'WebSocket.php';
 
 //$socket   = stream_socket_server('tcp://127.0.0.1:8000', $errno, $errstr);
 $socket = stream_socket_server('tcp://185.154.13.92:8124', $errno, $errstr);
@@ -58,7 +60,8 @@ function onOpen($connect, $data) {
     var_dump('connection opened');
     $ws = new WebSocket($connect);
     $decmessage = $ws->decode($data);
-    $tankData = json_decode($decmessage);
+    var_dump($decmessage['payload']);
+    $tankData = json_decode($decmessage['payload']);
     $tank = new Tank($tankData);
     TankRegistry::addTank($tank);
 //    $ws = new WebSocket($connect);
