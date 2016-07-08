@@ -66,7 +66,7 @@ class WebSocket
      *
      * @return array
      */
-    public function decode($data)
+    public static function decode($data)
     {
         $unmaskedPayload = '';
         $decodedData = array();
@@ -156,7 +156,7 @@ class WebSocket
         return $decodedData;
     }
 
-    public function encode($payload, $type = 'text', $masked = false)
+    public static function encode($payload, $type = 'text', $masked = false)
     {
         $frameHead = array();
         $payloadLength = strlen($payload);
