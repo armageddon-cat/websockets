@@ -40,8 +40,10 @@
         var socket = new WebSocket("ws://185.154.13.92:8124");
         tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'status':'initial','x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
         socket.onopen = function () {
-            socket.send(JSON.stringify(tankDataSingle));
+            var singetanksdatastringified = JSON.stringify(tankDataSingle);
             console.log("socket opened v2");
+            console.log(singetanksdatastringified);
+            socket.send(singetanksdatastringified);
         };
         tankData = [];
         
@@ -63,12 +65,13 @@
             console.log("IMAGE_OFFSET_XCodetankLogickeydown"+IMAGE_OFFSET_X);
             console.log("IMAGE_OFFSET_YCodetankLogickeydown"+IMAGE_OFFSET_Y);
             tempTankData = {'id': GUID, 'newd':e.keyCode};
-            tankData.find(findTank);
-            socket.send(JSON.stringify(tankData));
+//            tankData.find(findTank);
+            socket.send(JSON.stringify(tempTankData));
         });
 
         socket.onmessage = function (event) {
             console.log("someonecame"); // TODO remove debug!!
+            console.log(event.data); // TODO remove debug!!
             console.log("currentDirectionCodetankLogiconmessage"+currentDirectionCode);
             var data = JSON.parse(event.data);
             if (Array.isArray(data)) {
@@ -90,7 +93,9 @@
 //                } else {
 //                    canvasContext.drawImage(img, item.x, item.y);
 //                }
-                tankLogic(item, index, array);
+                console.log("beforetanklogicItem"); // TODO remove debug!!
+                console.log(item); // TODO remove debug!!
+                tankLogic(JSON.parse(item), index, array);
                 console.log("itemforEachStatusNotChanged"); // TODO remove debug!!
             });
             console.log("tanksData"); // TODO remove debug!!

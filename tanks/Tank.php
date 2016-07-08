@@ -2,8 +2,6 @@
 declare(strict_types=1);
 namespace Tanks;
 
-use stdClass;
-
 class Tank
 {
     private $id;
@@ -17,12 +15,13 @@ class Tank
     const CODE_RIGHT_ARROW = 39;
     const CODE_DOWN_ARROW = 40;
     
-    public function __construct(stdClass $tank)
+    public function __construct(\stdClass $tank)
     {
         $this->setId($tank->id);
         $this->setStatus($tank->status);
         $this->setX($tank->x);
         $this->setY($tank->y);
+        $this->setDirection($tank->newd);
     }
     
     public function moveTank() {
@@ -38,6 +37,7 @@ class Tank
         if($this->getDirection() === self::CODE_DOWN_ARROW) {
             $this->y += self::TANK_STEP;
         }
+//        $this->setDirection($this->getDirection());
     }
     
     
@@ -136,5 +136,17 @@ class Tank
     public function setStatus(string $status)
     {
         $this->status = (string)$status;
+    }
+    
+    /**
+     * @return string
+     */
+    public function __toString() : string
+    {
+        $result = [];
+        foreach ($this as $key => $value) {
+            $result[$key] = $value;
+        }
+        return json_encode($result);
     }
 }

@@ -22,11 +22,14 @@ while (true) {
     
     if (in_array($socket, $read)) {//есть новое соединение
         //принимаем новое соединение и производим рукопожатие:
-        /** @var resource $connect */
-        $ws = new WebSocket($connect);
-        if (($connect = stream_socket_accept($socket, -1)) && $info = $ws->handshake()) {
-            $connects[] = $connect;//добавляем его в список необходимых для обработки
-            onOpen($connect, $info);//вызываем пользовательский сценарий
+        if (($connect = stream_socket_accept($socket, -1))) {
+            /** @var resource $connect */
+            $ws = new WebSocket($connect);
+            $info = $ws->handshake();
+            if ($info) {
+                $connects[] = $connect;//добавляем его в список необходимых для обработки
+                onOpen($connect, $info);//вызываем пользовательский сценарий
+            }
         }
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
     }
@@ -54,11 +57,14 @@ fclose($socket);
  */
 function onOpen($connect, $data) {
     var_dump('connection opened');
-    $decmessage = WebSocket::decode($data);
-    var_dump($decmessage['payload']);
-    $tankData = json_decode($decmessage['payload']);
-    $tank = new Tank($tankData);
-    TankRegistry::addTank($tank);
+    // no operations needed to be here
+//    var_dump($data);
+//    $decmessage = WebSocket::decode($data);
+//    var_dump($decmessage['payload']);
+//    var_dump($decmessage);
+//    $tankData = json_decode($decmessage['payload']);
+//    $tank = new Tank($tankData);
+//    TankRegistry::addTank($tank);
 //    $ws = new WebSocket($connect);
 //    fwrite($connect, (new WebSocket($connect))->encode('Привет'));
 }
@@ -68,18 +74,27 @@ function onClose($a) {
 }
 
 /**
+ * everyone send only its data
  * @param resource $connect
  * @param $data
  */
 function onMessage($connect, $data) {
     var_dump('Someone Came');
-//    echo (new WebSocket($connect))->decode($data)['payload'] . "\n"; может для следующих версий
     $decmessage = WebSocket::decode($data);
     $tankData = json_decode($decmessage['payload']);
-    $tank = new Tank($tankData);
+    var_dump($decmessage['payload']);
+    var_dump($tankData);
+    if (!TankRegistry::checkTank($tankData->id)) {
+        $tank = new Tank($tankData);
+        TankRegistry::addTank($tank);
+    } else {
+        $tank = TankRegistry::getTank($tankData->id);
+        $tank->setDirection($tankData->newd); // todo refactor
+    }
     $tank->moveTank();
-    TankRegistry::addTank($tank);
-    $encmessage = WebSocket::encode(TankRegistry::getStorageJSON());
-    var_dump(TankRegistry::getStorageJSON());
+    var_dump($tank);
+    $storage = TankRegistry::getStorageJSON();
+    var_dump($storage);
+    $encmessage = WebSocket::encode($storage);
     fwrite($connect, $encmessage);
 }

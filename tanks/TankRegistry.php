@@ -21,9 +21,19 @@ class TankRegistry
      *
      * @return Tank
      */
-    public function getTank(string $id) : Tank
+    public static function getTank(string $id) : Tank
     {
         return self::$storage[$id];
+    }
+    
+    /**
+     * @param $id
+     *
+     * @return bool
+     */
+    public static function checkTank(string $id) : bool
+    {
+        return isset(self::$storage[$id]);
     }
     
     /**
@@ -43,10 +53,14 @@ class TankRegistry
     }
     
     /**
-     * @return array
+     * @return string
      */
-    public static function getStorageJSON() : array
+    public static function getStorageJSON() : string
     {
-        return json_encode(self::$storage);
+        $result = [];
+        foreach (self::$storage as $item) {
+            $result[] = (string)$item;
+        }
+        return json_encode($result);
     }
 }
