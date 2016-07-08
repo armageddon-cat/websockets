@@ -1,14 +1,9 @@
 <?php
+declare(strict_types=1);
 namespace Tanks;
 
 use stdClass;
 
-/**
- * Created by PhpStorm.
- * User: sera
- * Date: 01.07.2016
- * Time: 16:36
- */
 class Tank
 {
     private $id;
@@ -66,7 +61,7 @@ class Tank
     /**
      * @return mixed
      */
-    public function getId()
+    public function getId() : string
     {
         return (string)$this->id;
     }
@@ -74,7 +69,7 @@ class Tank
     /**
      * @param mixed $id
      */
-    public function setId($id)
+    public function setId(string $id)
     {
         $this->id = (string)$id;
     }
@@ -82,63 +77,63 @@ class Tank
     /**
      * @return mixed
      */
-    public function getX()
+    public function getX() : int
     {
         return (int)$this->x;
     }
     
     /**
-     * @param mixed $x
+     * @param int $x
      */
-    public function setX($x)
+    public function setX(int $x)
     {
         $this->x = (int)$x;
     }
     
     /**
-     * @return mixed
+     * @return int
      */
-    public function getY()
+    public function getY() : int
     {
         return (int)$this->y;
     }
     
     /**
-     * @param mixed $y
+     * @param int $y
      */
-    public function setY($y)
+    public function setY(int $y)
     {
         $this->y = (int)$y;
     }
     
     /**
-     * @return mixed
+     * @return int
      */
-    public function getDirection()
+    public function getDirection() : int
     {
         return (int)$this->direction;
     }
     
     /**
-     * @param mixed $direction
+     * @param int $direction
      */
-    public function setDirection($direction)
+    public function setDirection(int $direction)
     {
         $this->direction = (int)$direction;
     }
     
     /**
-     * @return mixed
+     * @return string
      */
-    public function getStatus()
+    public function getStatus() : string
     {
         return (string)$this->status;
     }
     
     /**
-     * @param mixed $status
+     * @param string $status
      */
-    public function setStatus($status)
+    public function setStatus(string $status)
     {
         $this->status = (string)$status;
     }

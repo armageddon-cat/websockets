@@ -1,13 +1,8 @@
 <?php
+declare(strict_types=1);
 namespace Tanks;
 use WebSocket\WebSocket;
 require __DIR__ . '/../vendor/autoload.php';
-/**
- * Created by PhpStorm.
- * User: sera
- * Date: 20.06.2016
- * Time: 23:44
- */
 
 //$socket   = stream_socket_server('tcp://127.0.0.1:8000', $errno, $errstr);
 $socket = stream_socket_server('tcp://185.154.13.92:8124', $errno, $errstr);

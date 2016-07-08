@@ -1,17 +1,16 @@
 <?php
+declare(strict_types=1);
 namespace Tanks;
-/**
- * Created by PhpStorm.
- * User: sera
- * Date: 01.07.2016
- * Time: 16:38
- */
+
 class TankRegistry
 {
+    /**
+    *  @param array $storage
+    */
     private static $storage = [];
     
     /**
-     * @param \Tank $tank
+     * @param Tank $tank
      */
     public static function addTank(Tank $tank) {
         self::$storage[$tank->getId()] = $tank;
@@ -20,9 +19,9 @@ class TankRegistry
     /**
      * @param $id
      *
-     * @return mixed
+     * @return Tank
      */
-    public function getTank($id)
+    public function getTank(string $id) : Tank
     {
         return self::$storage[$id];
     }
@@ -30,7 +29,7 @@ class TankRegistry
     /**
      * @param $id
      */
-    public function removeTank($id)
+    public function removeTank(string $id)
     {
         unset(self::$storage[$id]);
     }
@@ -38,7 +37,7 @@ class TankRegistry
     /**
      * @return array
      */
-    public static function getStorage()
+    public static function getStorage() : array
     {
         return self::$storage;
     }
@@ -46,7 +45,7 @@ class TankRegistry
     /**
      * @return array
      */
-    public static function getStorageJSON()
+    public static function getStorageJSON() : array
     {
         return json_encode(self::$storage);
     }
