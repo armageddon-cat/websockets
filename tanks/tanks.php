@@ -142,26 +142,26 @@
 //            canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
             canvasContext.save();
             canvasContext.translate(TRANSLATE_VALUE_X, TRANSLATE_VALUE_Y);
-            if (currentTankData.newd == CODE_LEFT_ARROW) {
+            if (currentTankData.direction == CODE_LEFT_ARROW) {
                 tankData[index].currentd = CODE_LEFT_ARROW;
                 currentDirection = DIRECTION_LEFT; // new current currentDirection
                 console.log("left pressed. currentDirection=" + currentTankData.currentd);
             }
-            if (currentTankData.newd == CODE_UP_ARROW) {
+            if (currentTankData.direction == CODE_UP_ARROW) {
                 canvasContext.rotate(ROTATE_CLOCKWISE);
                 console.log("up 90");
                 tankData[index].currentd = CODE_UP_ARROW;
                 currentDirection = DIRECTION_UP;
                 console.log("up pressed. currentDirection=" + currentTankData.currentd);
             }
-            if (currentTankData.newd == CODE_RIGHT_ARROW) {
+            if (currentTankData.direction == CODE_RIGHT_ARROW) {
                 canvasContext.rotate(ROTATE_OPPOSITE);
                 console.log("right 180");
                 tankData[index].currentd = CODE_RIGHT_ARROW;
                 currentDirection = DIRECTION_RIGHT;
                 console.log("right pressed. currentDirection=" + currentTankData.currentd);
             }
-            if (currentTankData.newd == CODE_DOWN_ARROW) {
+            if (currentTankData.direction == CODE_DOWN_ARROW) {
                 canvasContext.rotate(ROTATE_COUNTERCLOCKWISE);
                 console.log("down 270");
                 tankData[index].currentd = CODE_DOWN_ARROW;
