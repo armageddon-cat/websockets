@@ -21,11 +21,8 @@
         CODE_UP_ARROW = 38;
         CODE_RIGHT_ARROW = 39;
         CODE_DOWN_ARROW = 40;
+        CODE_ENTER = 13;
         CODE_ARROWS = [37, 38, 39, 40];
-        DIRECTION_LEFT = 'left';
-        DIRECTION_UP = 'up';
-        DIRECTION_RIGHT = 'right';
-        DIRECTION_DOWN = 'down';
         TRANSLATE_VALUE_X = IMAGE_OFFSET_X+SIZE_IMAGE*0.5;
         TRANSLATE_VALUE_Y = IMAGE_OFFSET_Y+SIZE_IMAGE*0.5;
         TRANSLATE_VALUE_NEGATIVE_X = -(IMAGE_OFFSET_X+SIZE_IMAGE*0.5);
@@ -40,10 +37,8 @@
         var socket = new WebSocket("ws://185.154.13.92:8124");
         tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'status':'initial','x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
         socket.onopen = function () {
-            var singetanksdatastringified = JSON.stringify(tankDataSingle);
             console.log("socket opened v2");
-            console.log(singetanksdatastringified);
-            socket.send(singetanksdatastringified);
+            socket.send(JSON.stringify(tankDataSingle));
         };
         tankData = [];
         
@@ -54,151 +49,106 @@
 //        canvasContext.fillRect(IMAGE_OFFSET_X, IMAGE_OFFSET_Y, SIZE_IMAGE, SIZE_IMAGE);
 //        canvasContext.clearRect(IMAGE_OFFSET_X+10,IMAGE_OFFSET_Y+10,SIZE_IMAGE/10,SIZE_IMAGE/10);
         canvasContext.drawImage(img, IMAGE_OFFSET_X, IMAGE_OFFSET_Y);
-        var currentDirection = DIRECTION_LEFT;
         currentDirectionCode = CODE_LEFT_ARROW;
         window.addEventListener('keydown', function (e) {
+            if (e.keyCode === CODE_ENTER) { // not arrow
+                console.log("enter code");
+                canvasContext.fillStyle = "#4D4E53";
+                xsize = 10;
+                ysize = 10;
+                bofsetx = TRANSLATE_VALUE_X;
+                bofsety = TRANSLATE_VALUE_Y;
+                console.log("currentDirectionCode"+currentDirectionCode);
+//                console.log("bdirection1"+bdirection);
+                var intervalID = setInterval(bulletMove, 500, currentDirectionCode);
+                function bulletMove(bdirection) {
+//                    if(bofsetx == 200) {
+//                        clearInterval(intervalID);
+//                    }
+                    console.log("bdirection2"+bdirection);
+                    canvasContext.clearRect(bofsetx,bofsety,xsize,ysize);
+                    console.log('bofsetx'+bofsetx+'bofsety'+bofsety);
+                    if (bdirection == CODE_LEFT_ARROW) {
+                        bofsetx-=10;
+                    }
+                    console.log("bdirection3"+bdirection);
+                    if (bdirection == CODE_UP_ARROW) {
+                        bofsety-=10;
+                    }
+                    console.log("bdirection4"+bdirection);
+                    if (bdirection == CODE_RIGHT_ARROW) {
+                        bofsetx+=10;
+                    }
+                    console.log("bdirection5"+bdirection);
+                    if (bdirection == CODE_DOWN_ARROW) {
+                        bofsety+=10;
+                    }
+                    console.log("bdirection6"+bdirection);
+                    console.log("bullet");
+                    console.log("bdirection7"+bdirection);
+                    console.log('bofsetx'+bofsetx+'bofsety'+bofsety+'xsize'+xsize+'ysize'+ysize);
+                    canvasContext.fillRect(bofsetx, bofsety, xsize, ysize);
+                    console.log("bdirection8"+bdirection);
+                }
+                if (currentDirectionCode == CODE_LEFT_ARROW || currentDirectionCode == CODE_RIGHT_ARROW) {
+                    var timend = ((SIZE_CANVAS - bofsetx) / 10) * 500;
+                }
+                if (currentDirectionCode == CODE_UP_ARROW || currentDirectionCode == CODE_DOWN_ARROW) {
+                    var timend = ((SIZE_CANVAS - bofsety) / 10) * 500;
+                }
+                console.log("timend"+timend);
+                setTimeout(function() { clearInterval(intervalID); }, timend);
+    
+    
+                return;
+            }
             if (CODE_ARROWS.indexOf(e.keyCode) === -1) { // not arrow
                 console.log("not arrow");
                 return;
             }
-            console.log("currentDirectionCodetankLogickeydown"+currentDirectionCode);
-            console.log("IMAGE_OFFSET_XCodetankLogickeydown"+IMAGE_OFFSET_X);
-            console.log("IMAGE_OFFSET_YCodetankLogickeydown"+IMAGE_OFFSET_Y);
             tempTankData = {'id': GUID, 'newd':e.keyCode};
-//            tankData.find(findTank);
             socket.send(JSON.stringify(tempTankData));
         });
 
         socket.onmessage = function (event) {
-            console.log("someonecame"); // TODO remove debug!!
-            console.log(event.data); // TODO remove debug!!
-            console.log("currentDirectionCodetankLogiconmessage"+currentDirectionCode);
-            var data = JSON.parse(event.data);
-            if (Array.isArray(data)) {
-                // existing user
-                tankData = data;
-                console.log("exuser"); // TODO remove debug!!
-            } else {
-                // onopen user
-                console.log("newuser"); // TODO remove debug!!
-                tankData.push(JSON.parse(event.data));
-            }
+            tankData = JSON.parse(event.data);
             canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
-            tankData.forEach(function(item, index, array) {
-//                if (item.status == 'changed') {
-//                    item.status = 'nochanges';
-//                    console.log("itemforEach"); // TODO remove debug!!
-//                    console.log(item); // TODO remove debug!!
-//                    tankLogic(item, index, array);
-//                } else {
-//                    canvasContext.drawImage(img, item.x, item.y);
-//                }
-                console.log("beforetanklogicItem"); // TODO remove debug!!
-                console.log(item); // TODO remove debug!!
-                tankLogic(JSON.parse(item), index, array);
-                console.log("itemforEachStatusNotChanged"); // TODO remove debug!!
+            tankData.forEach(function(item, index) {
+                var currentTankDataParsed = JSON.parse(item);
+                console.log("item.id"+currentTankDataParsed.id);
+                console.log("GUID"+GUID);
+                if(currentTankDataParsed.id == GUID) {
+                    currentDirectionCode = currentTankDataParsed.direction;
+                    IMAGE_OFFSET_X = currentTankDataParsed.x;
+                    IMAGE_OFFSET_Y = currentTankDataParsed.y;
+                    console.log('currentDirectionCode'+currentDirectionCode);
+                    console.log('IMAGE_OFFSET_X'+IMAGE_OFFSET_X);
+                    console.log('IMAGE_OFFSET_Y'+IMAGE_OFFSET_Y);
+                }
+                tankLogic(currentTankDataParsed, index);
             });
-            console.log("tanksData"); // TODO remove debug!!
-            console.log(tankData); // TODO remove debug!!
             
         };
-        // on open должен вызвать tankLogic получив от сервера масив текущих танков. и проитерировать их все отрисовав
-        // вполне возможно нужно добавить флаг карент в джосон чтоб знак какие танки сдвинулись. пока не ясно
-        function tankLogic(currentTankData, index, array) {
-            console.log("currentDirectionCodetankLogicStart"+currentTankData.currentd);
-//            tankData = JSON.parse(tankData);
-//            IMAGE_OFFSET_X = currentTankData.x;
-//            IMAGE_OFFSET_Y = currentTankData.y;
-//            currentDirectionCode = currentTankData.currentd;
-//            var tankDirection = currentTankData.newd;
-//            currentTankData.x = 225;
-//            array[index].x=235;
-//            tankData[index].x=245;
-//            console.log("trychangeobject"); // TODO remove debug!!
-//            console.log(tankData[index].x); // TODO remove debug!!
-//            console.log(currentTankData); // TODO remove debug!!
-//            console.log(array); // TODO remove debug!!
-//            console.log(tankData); // TODO remove debug!!
-            console.log("currentDirectionCodetankLogicStartAfter"+currentTankData.currentd);
-            console.log("before outside moveTank x" + IMAGE_OFFSET_X);
-            console.log("before outside moveTank y" + IMAGE_OFFSET_Y);
-//            if (currentTankData.currentd == currentTankData.newd && currentTankData.status == 'changed') { // same direction
-//                currentTankData.status = 'nochanges';
-//                console.log("same direction");
-//                moveTank(currentTankData.currentd, currentTankData);
-//
-//            }
+        function tankLogic(currentTankData, index) {
             recalcTranslate(currentTankData);
-//            array[index].x=IMAGE_OFFSET_X;
-//            array[index].y=IMAGE_OFFSET_Y;
-            console.log("outside moveTank x" + IMAGE_OFFSET_X);
-            console.log("outside moveTank y" + IMAGE_OFFSET_Y);
-            console.log("tank outside moveTank x" + currentTankData.x);
-            console.log("tank outside moveTank y" + currentTankData.y);
-//            console.log("TRANSLATE_VALUE_X" + TRANSLATE_VALUE_X);
-//            console.log("TRANSLATE_VALUE_Y" + TRANSLATE_VALUE_Y);
-//            console.log("TRANSLATE_VALUE_NEGATIVE_X" + TRANSLATE_VALUE_NEGATIVE_X);
-//            console.log("TRANSLATE_VALUE_NEGATIVE_Y" + TRANSLATE_VALUE_NEGATIVE_Y);
-//            canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
             canvasContext.save();
             canvasContext.translate(TRANSLATE_VALUE_X, TRANSLATE_VALUE_Y);
             if (currentTankData.direction == CODE_LEFT_ARROW) {
-                tankData[index].currentd = CODE_LEFT_ARROW;
-                currentDirection = DIRECTION_LEFT; // new current currentDirection
-                console.log("left pressed. currentDirection=" + currentTankData.currentd);
             }
             if (currentTankData.direction == CODE_UP_ARROW) {
                 canvasContext.rotate(ROTATE_CLOCKWISE);
-                console.log("up 90");
-                tankData[index].currentd = CODE_UP_ARROW;
-                currentDirection = DIRECTION_UP;
-                console.log("up pressed. currentDirection=" + currentTankData.currentd);
             }
             if (currentTankData.direction == CODE_RIGHT_ARROW) {
                 canvasContext.rotate(ROTATE_OPPOSITE);
-                console.log("right 180");
-                tankData[index].currentd = CODE_RIGHT_ARROW;
-                currentDirection = DIRECTION_RIGHT;
-                console.log("right pressed. currentDirection=" + currentTankData.currentd);
             }
             if (currentTankData.direction == CODE_DOWN_ARROW) {
                 canvasContext.rotate(ROTATE_COUNTERCLOCKWISE);
-                console.log("down 270");
-                tankData[index].currentd = CODE_DOWN_ARROW;
-                currentDirection = DIRECTION_DOWN;
-                console.log("down pressed. currentDirection=" + currentTankData.currentd);
             }
             canvasContext.translate(TRANSLATE_VALUE_NEGATIVE_X, TRANSLATE_VALUE_NEGATIVE_Y);
-//            canvasContext.fillStyle = "#4D4E53";
-//            canvasContext.fillRect(IMAGE_OFFSET_X, IMAGE_OFFSET_Y, SIZE_IMAGE, SIZE_IMAGE);
-//            canvasContext.clearRect(IMAGE_OFFSET_X+10,IMAGE_OFFSET_Y+10,SIZE_IMAGE/10,SIZE_IMAGE/10);
-            console.log("draw image on cors " + currentTankData.x+' Y '+currentTankData.y ); // TODO remove debug!!
             canvasContext.drawImage(img, currentTankData.x, currentTankData.y);
             canvasContext.restore();
-//            socket.send(JSON.stringify(tankData));
-            console.log("keydown");
-            console.log("currentDirectionCodetankLogicEnd"+currentTankData.currentd);
         }
 
-        function moveTank(currentDirectionCode, currentTankData) {
-            if(currentDirectionCode == CODE_LEFT_ARROW) {
-                currentTankData.x -= TANK_STEP;
-                console.log("left pressed. currentDirectionMove=" + currentDirection);
-            }
-            if(currentDirectionCode == CODE_UP_ARROW) {
-                currentTankData.y -= TANK_STEP;
-                console.log("up pressed. currentDirectionMove=" + currentDirection);
-            }
-            if(currentDirectionCode == CODE_RIGHT_ARROW) {
-                currentTankData.x += TANK_STEP;
-                console.log("right pressed. currentDirectionMove=" + currentDirection);
-            }
-            if(currentDirectionCode == CODE_DOWN_ARROW) {
-                currentTankData.y += TANK_STEP;
-                console.log("down pressed. currentDirectionMove=" + currentDirection);
-            }
-        }
-        
         function recalcTranslate(currentTankData) {
             TRANSLATE_VALUE_X = currentTankData.x+SIZE_IMAGE*0.5;
             TRANSLATE_VALUE_Y = currentTankData.y+SIZE_IMAGE*0.5;
@@ -214,10 +164,8 @@
             });
         }
 
-        function findTank(element, index, array) {
+        function findTank(element) {
             if (element.id == GUID) {
-                array[index].newd = tempTankData.newd;
-                array[index].status = 'changed';
                 return true;
             }
             return false;
