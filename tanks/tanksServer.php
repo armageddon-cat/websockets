@@ -44,7 +44,9 @@ while (true) {
         }
         
         foreach ($connects as $currentConnect) {
-            onMessage($currentConnect, $data);//вызываем пользовательский сценарий
+            if (!empty($data)) {
+                onMessage($currentConnect, $data);//вызываем пользовательский сценарий
+            }
         }
     }
 }
@@ -58,30 +60,30 @@ fclose($socket);
 function onOpen($connect, $data) {
     var_dump('connection opened');
     // no operations needed to be here
-//    var_dump($data);
-//    $decmessage = WebSocket::decode($data);
-//    var_dump($decmessage['payload']);
-//    var_dump($decmessage);
-//    $tankData = json_decode($decmessage['payload']);
-//    $tank = new Tank($tankData);
-//    TankRegistry::addTank($tank);
-//    $ws = new WebSocket($connect);
-//    fwrite($connect, (new WebSocket($connect))->encode('Привет'));
 }
 
 function onClose($a) {
     var_dump('connection lost, sorian');
+    // infuture maybe unset tank here
 }
 
 /**
  * everyone send only its data
+ *
  * @param resource $connect
- * @param $data
+ * @param          $data
+ *
+ * @return bool
  */
 function onMessage($connect, $data) {
     var_dump('Someone Came');
     $decmessage = WebSocket::decode($data);
     $tankData = json_decode($decmessage['payload']);
+    if ($tankData === null) {
+        var_dump('wrong data');
+        var_dump(json_last_error_msg());
+        return false;
+    }
     var_dump($decmessage['payload']);
     var_dump($tankData);
     if (!TankRegistry::checkTank($tankData->id)) {
