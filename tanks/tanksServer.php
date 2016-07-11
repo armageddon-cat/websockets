@@ -78,25 +78,60 @@ function onClose($a) {
 function onMessage($connect, $data) {
     var_dump('Someone Came');
     $decmessage = WebSocket::decode($data);
-    $tankData = json_decode($decmessage['payload']);
-    if ($tankData === null) {
+    $dataObject = json_decode($decmessage['payload']);
+    if ($dataObject === null) {
         var_dump('wrong data');
         var_dump(json_last_error_msg());
         return false;
     }
-    var_dump($decmessage['payload']);
-    var_dump($tankData);
-    if (!TankRegistry::checkTank($tankData->id)) {
-        $tank = new Tank($tankData);
+    if (isset($dataObject->type) && $dataObject->type === 'bullet') {
+        if (!BulletRegistry::checkBullet($dataObject->id)) {
+            $bullet = new Bullet($dataObject);
+            BulletRegistry::addBullet($bullet);
+            $tankBullet = TankRegistry::getTank($dataObject->id);
+            $tankBullet->setBullet($bullet);
+        }
+    }
+//    var_dump('$decmessage');
+//    var_dump($decmessage['payload']);
+//    var_dump('$dataObject');
+//    var_dump($dataObject);
+    if (!TankRegistry::checkTank($dataObject->id)) {
+        $tank = new Tank($dataObject);
         TankRegistry::addTank($tank);
     } else {
-        $tank = TankRegistry::getTank($tankData->id);
-        $tank->setDirection($tankData->newd); // todo refactor
+        $tank = TankRegistry::getTank($dataObject->id);
+        if (!empty($dataObject->newd)) {
+            $tank->setDirection($dataObject->newd); // todo refactor
+        }
     }
-    $tank->moveTank();
-    var_dump($tank);
+    if (!empty($dataObject->newd)) {
+        $tank->moveTank(); // todo refactor
+    }
+    $bullets = BulletRegistry::getStorage();
+//    var_dump('$bullets');
+//    var_dump($bullets);
+    if (count($bullets) !== 0) {
+        /** @var Bullet $bullet */
+        foreach ($bullets as $bullet) {
+            $bullet->checkIntersection();
+            BulletRegistry::removeBullet($bullet->getId());
+        }
+    }
+//    var_dump('$tank');
+//    var_dump($tank);
     $storage = TankRegistry::getStorageJSON();
+    // after shooting and checking intesection. save tank state. and now we can unset bullets
+    if (count($bullets) !== 0) {
+        TankRegistry::unsetBullets();
+        BulletRegistry::unsetStorage();
+    }
+    BulletRegistry::unsetStorage();
+    var_dump('$storage');
     var_dump($storage);
+    $storage1 = TankRegistry::getStorageJSON();
+    var_dump('$storage1');
+    var_dump($storage1);
     $encmessage = WebSocket::encode($storage);
     fwrite($connect, $encmessage);
 }

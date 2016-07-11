@@ -9,57 +9,40 @@ class Tank
     private $y;
     private $direction;
     private $status;
+    private $bullet;
     const TANK_STEP = 10;
-    const CODE_LEFT_ARROW = 37;
-    const CODE_UP_ARROW = 38;
-    const CODE_RIGHT_ARROW = 39;
-    const CODE_DOWN_ARROW = 40;
+    const TANK_SIZE = 100;
+    const DEAD = 0;
+    const ALIVE = 1;
+    const TANK_BARREL_OFFSET_VALUE = 60;
     
     public function __construct(\stdClass $tank)
     {
         $this->setId($tank->id);
-        $this->setStatus($tank->status);
+        $this->setStatus(Tank::ALIVE);
         $this->setX($tank->x);
         $this->setY($tank->y);
         $this->setDirection($tank->newd);
     }
     
     public function moveTank() {
-        if($this->getDirection() === self::CODE_LEFT_ARROW) {
+        $direction = $this->getDirection();
+        if($direction === Canvas::CODE_LEFT_ARROW) {
             $this->x -= self::TANK_STEP;
         }
-        if($this->getDirection() === self::CODE_UP_ARROW) {
+        if($direction === Canvas::CODE_UP_ARROW) {
             $this->y -= self::TANK_STEP;
         }
-        if($this->getDirection() === self::CODE_RIGHT_ARROW) {
+        if($direction === Canvas::CODE_RIGHT_ARROW) {
             $this->x += self::TANK_STEP;
         }
-        if($this->getDirection() === self::CODE_DOWN_ARROW) {
+        if($direction === Canvas::CODE_DOWN_ARROW) {
             $this->y += self::TANK_STEP;
         }
-//        $this->setDirection($this->getDirection());
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     /**
-     * @return mixed
+     * @return string
      */
     public function getId() : string
     {
@@ -75,7 +58,7 @@ class Tank
     }
     
     /**
-     * @return mixed
+     * @return int
      */
     public function getX() : int
     {
@@ -123,19 +106,19 @@ class Tank
     }
     
     /**
-     * @return string
+     * @return int
      */
-    public function getStatus() : string
+    public function getStatus() : int
     {
-        return (string)$this->status;
+        return (int)$this->status;
     }
     
     /**
-     * @param string $status
+     * @param int $status
      */
-    public function setStatus(string $status)
+    public function setStatus(int $status)
     {
-        $this->status = (string)$status;
+        $this->status = (int)$status;
     }
     
     /**
@@ -146,7 +129,93 @@ class Tank
         $result = [];
         foreach ($this as $key => $value) {
             $result[$key] = $value;
+            if (is_object($value)) {
+                $result[$key] = (string)$value;
+            }
         }
         return json_encode($result);
+    }
+    
+    /**
+     * @return Bullet
+     */
+    public function getBullet() : Bullet
+    {
+        return $this->bullet;
+    }
+    
+    /**
+     * @param Bullet $bullet
+     */
+    public function setBullet(Bullet $bullet)
+    {
+        $this->bullet = $bullet;
+    }
+    
+    public function unsetBullet()
+    {
+        unset($this->bullet);
+    }
+    
+    /**
+     * @return int
+     */
+    public function getTankCenterX() : int
+    {
+        $tankCenterX = $this->getX() + Tank::TANK_SIZE * 0.5;
+        return (int)$tankCenterX;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getTankCenterY() : int
+    {
+        $tankCenterY = $this->getY() + Tank::TANK_SIZE * 0.5;
+        return (int)$tankCenterY;
+    }
+    
+    /**
+     * @param string $type
+     *
+     * @return int
+     */
+    private function calculateOffset(string $type) : int
+    {
+        $direction   = $this->getDirection();
+        $offsetValue = 0;
+        
+        if ($direction === Canvas::CODE_LEFT_ARROW && $type === Canvas::AXIS_X) {
+            $offsetValue = -self::TANK_BARREL_OFFSET_VALUE;
+        }
+        if ($direction === Canvas::CODE_UP_ARROW && $type === Canvas::AXIS_Y) {
+            $offsetValue = -self::TANK_BARREL_OFFSET_VALUE;
+        }
+        if ($direction === Canvas::CODE_RIGHT_ARROW && $type === Canvas::AXIS_X) {
+            $offsetValue = self::TANK_BARREL_OFFSET_VALUE;
+        }
+        if ($direction === Canvas::CODE_DOWN_ARROW && $type === Canvas::AXIS_Y) {
+            $offsetValue = self::TANK_BARREL_OFFSET_VALUE;
+        }
+        
+        return (int)$offsetValue;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getTankBarrelX() : int
+    {
+        $tankBarrel = $this->getTankCenterX() + $this->calculateOffset(Canvas::AXIS_X);
+        return (int)$tankBarrel;
+    }
+    
+    /**
+     * @return int
+     */
+    public function getTankBarrelY() : int
+    {
+        $tankBarrel = $this->getTankCenterY() + $this->calculateOffset(Canvas::AXIS_Y);
+        return (int)$tankBarrel;
     }
 }

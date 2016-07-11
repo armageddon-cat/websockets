@@ -63,4 +63,11 @@ class TankRegistry
         }
         return json_encode($result);
     }
+    
+    public static function unsetBullets()
+    {
+        foreach (self::$storage as $item) {
+            $item->unsetBullet();
+        }
+    }
 }

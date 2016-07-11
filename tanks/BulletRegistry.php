@@ -40,7 +40,7 @@ class BulletRegistry
     /**
      * @param $id
      */
-    public function removeBullet(string $id)
+    public static function removeBullet(string $id)
     {
         unset(self::$storage[$id]);
     }
@@ -51,5 +51,13 @@ class BulletRegistry
     public static function getStorage() : array
     {
         return self::$storage;
+    }
+    
+    /**
+     *
+     */
+    public static function unsetStorage()
+    {
+        self::$storage = [];
     }
 }

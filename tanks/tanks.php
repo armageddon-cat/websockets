@@ -33,9 +33,15 @@
         ROTATE_OPPOSITE = RAD_TO_DEG*180;
         TANK_STEP = 10;
         GUID = createGuid();
+        TANK_DEAD = 0;
+        TANK_ALIVE = 1;
+        BULLET_SIZE = 10;
+        BULLET_DELAY = 20;
+        BULLET_STEP = 10;
         
+//        var socket = new WebSocket("ws://127.0.0.1:8000");
         var socket = new WebSocket("ws://185.154.13.92:8124");
-        tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'status':'initial','x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
+        tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
         socket.onopen = function () {
             console.log("socket opened v2");
             socket.send(JSON.stringify(tankDataSingle));
@@ -53,53 +59,7 @@
         window.addEventListener('keydown', function (e) {
             if (e.keyCode === CODE_ENTER) { // not arrow
                 console.log("enter code");
-                canvasContext.fillStyle = "#4D4E53";
-                xsize = 10;
-                ysize = 10;
-                bofsetx = TRANSLATE_VALUE_X;
-                bofsety = TRANSLATE_VALUE_Y;
-                console.log("currentDirectionCode"+currentDirectionCode);
-//                console.log("bdirection1"+bdirection);
-                var intervalID = setInterval(bulletMove, 500, currentDirectionCode);
-                function bulletMove(bdirection) {
-//                    if(bofsetx == 200) {
-//                        clearInterval(intervalID);
-//                    }
-                    console.log("bdirection2"+bdirection);
-                    canvasContext.clearRect(bofsetx,bofsety,xsize,ysize);
-                    console.log('bofsetx'+bofsetx+'bofsety'+bofsety);
-                    if (bdirection == CODE_LEFT_ARROW) {
-                        bofsetx-=10;
-                    }
-                    console.log("bdirection3"+bdirection);
-                    if (bdirection == CODE_UP_ARROW) {
-                        bofsety-=10;
-                    }
-                    console.log("bdirection4"+bdirection);
-                    if (bdirection == CODE_RIGHT_ARROW) {
-                        bofsetx+=10;
-                    }
-                    console.log("bdirection5"+bdirection);
-                    if (bdirection == CODE_DOWN_ARROW) {
-                        bofsety+=10;
-                    }
-                    console.log("bdirection6"+bdirection);
-                    console.log("bullet");
-                    console.log("bdirection7"+bdirection);
-                    console.log('bofsetx'+bofsetx+'bofsety'+bofsety+'xsize'+xsize+'ysize'+ysize);
-                    canvasContext.fillRect(bofsetx, bofsety, xsize, ysize);
-                    console.log("bdirection8"+bdirection);
-                }
-                if (currentDirectionCode == CODE_LEFT_ARROW || currentDirectionCode == CODE_RIGHT_ARROW) {
-                    var timend = ((SIZE_CANVAS - bofsetx) / 10) * 500;
-                }
-                if (currentDirectionCode == CODE_UP_ARROW || currentDirectionCode == CODE_DOWN_ARROW) {
-                    var timend = ((SIZE_CANVAS - bofsety) / 10) * 500;
-                }
-                console.log("timend"+timend);
-                setTimeout(function() { clearInterval(intervalID); }, timend);
-    
-    
+                socket.send(JSON.stringify({'id': GUID, 'type':'bullet'}));
                 return;
             }
             if (CODE_ARROWS.indexOf(e.keyCode) === -1) { // not arrow
@@ -117,6 +77,12 @@
                 var currentTankDataParsed = JSON.parse(item);
                 console.log("item.id"+currentTankDataParsed.id);
                 console.log("GUID"+GUID);
+                console.log("tankstatus="+currentTankDataParsed.status); // TODO remove debug!!
+                if (currentTankDataParsed.status == TANK_DEAD) {
+                    console.log("tankdead"); // TODO remove debug!!
+                    return;
+                }
+                console.log("tankalive"); // TODO remove debug!!
                 if(currentTankDataParsed.id == GUID) {
                     currentDirectionCode = currentTankDataParsed.direction;
                     IMAGE_OFFSET_X = currentTankDataParsed.x;
@@ -130,9 +96,13 @@
             
         };
         function tankLogic(currentTankData, index) {
+            console.log("currentTankData"); // TODO remove debug!!
+            console.log(currentTankData); // TODO remove debug!!
+            console.log('currentTankData x='+currentTankData.x+'y='+currentTankData.y); // TODO remove debug!!
             recalcTranslate(currentTankData);
             canvasContext.save();
             canvasContext.translate(TRANSLATE_VALUE_X, TRANSLATE_VALUE_Y);
+            console.log("trans xy neg xy. x="+TRANSLATE_VALUE_X+'y='+TRANSLATE_VALUE_Y+'mx='+TRANSLATE_VALUE_NEGATIVE_X+'my='+TRANSLATE_VALUE_NEGATIVE_Y+'end'); // TODO remove debug!!
             if (currentTankData.direction == CODE_LEFT_ARROW) {
             }
             if (currentTankData.direction == CODE_UP_ARROW) {
@@ -145,8 +115,54 @@
                 canvasContext.rotate(ROTATE_COUNTERCLOCKWISE);
             }
             canvasContext.translate(TRANSLATE_VALUE_NEGATIVE_X, TRANSLATE_VALUE_NEGATIVE_Y);
+            console.log("trans neg x y = "+TRANSLATE_VALUE_NEGATIVE_X+TRANSLATE_VALUE_NEGATIVE_Y+'tank xy='+currentTankData.x+currentTankData.y); // TODO remove debug!!
             canvasContext.drawImage(img, currentTankData.x, currentTankData.y);
             canvasContext.restore();
+            //--------------------bullet logic-------------------------------------
+            console.log("currentTankData"); // TODO remove debug!!
+            console.log(currentTankData); // TODO remove debug!!
+            if (currentTankData.bullet && currentTankData.bullet != '' && currentTankData.bullet != null) {
+                currentTankData.bullet = JSON.parse(currentTankData.bullet);
+                canvasContext.fillStyle = "#4D4E53";
+                bofsetx = TRANSLATE_VALUE_X;
+                bofsety = TRANSLATE_VALUE_Y;
+                console.log("currentDirectionCode"+currentDirectionCode);
+                var intervalID = setInterval(bulletMove, BULLET_DELAY, currentTankData);
+                function bulletMove(currentTankDataInside) {
+                    console.log("bdirection2"+currentTankDataInside.direction);
+                    canvasContext.clearRect(currentTankDataInside.bullet.x,currentTankDataInside.bullet.y,BULLET_SIZE,BULLET_SIZE);
+                    console.log('currentTankDataInside.bullet.x'+currentTankDataInside.bullet.x+'currentTankDataInside.bullet.y'+currentTankDataInside.bullet.y);
+                    if (currentTankDataInside.direction == CODE_LEFT_ARROW) {
+                        currentTankDataInside.bullet.x-=BULLET_STEP;
+                    }
+                    console.log("currentTankDataInside.direction3"+currentTankDataInside.direction);
+                    if (currentTankDataInside.direction == CODE_UP_ARROW) {
+                        currentTankDataInside.bullet.y-=BULLET_STEP;
+                    }
+                    console.log("currentTankDataInside.direction4"+currentTankDataInside.direction);
+                    if (currentTankDataInside.direction == CODE_RIGHT_ARROW) {
+                        currentTankDataInside.bullet.x+=BULLET_STEP;
+                    }
+                    console.log("currentTankDataInside.direction5"+currentTankDataInside.direction);
+                    if (currentTankDataInside.direction == CODE_DOWN_ARROW) {
+                        currentTankDataInside.bullet.y+=BULLET_STEP;
+                    }
+                    console.log("currentTankDataInside.direction6"+currentTankDataInside.direction);
+                    console.log("bullet");
+                    console.log("currentTankDataInside.direction7"+currentTankDataInside.direction);
+                    console.log('currentTankDataInside.bullet.x'+currentTankDataInside.bullet.x+'currentTankDataInside.bullet.y'+currentTankDataInside.bullet.y+'BULLET_SIZE'+BULLET_SIZE+'BULLET_SIZE'+BULLET_SIZE);
+                    canvasContext.fillRect(currentTankDataInside.bullet.x, currentTankDataInside.bullet.y, BULLET_SIZE, BULLET_SIZE);
+                    console.log("currentTankDataInside.direction8"+currentTankDataInside.direction);
+                }
+                if (currentDirectionCode == CODE_LEFT_ARROW || currentDirectionCode == CODE_RIGHT_ARROW) {
+                    var timend = ((SIZE_CANVAS - currentTankData.bullet.x) / BULLET_STEP) * BULLET_DELAY;
+                }
+                if (currentDirectionCode == CODE_UP_ARROW || currentDirectionCode == CODE_DOWN_ARROW) {
+                    var timend = ((SIZE_CANVAS - currentTankData.bullet.y) / BULLET_STEP) * BULLET_DELAY;
+                }
+                console.log("timend"+timend);
+                setTimeout(function() { clearInterval(intervalID); }, timend);
+            }
         }
 
         function recalcTranslate(currentTankData) {
