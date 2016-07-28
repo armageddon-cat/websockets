@@ -15,14 +15,17 @@ class Tank
     const DEAD = 0;
     const ALIVE = 1;
     const TANK_BARREL_OFFSET_VALUE = 60;
+    const DEFAULT_TANK_CORS_X = 150;
+    const DEFAULT_TANK_CORS_Y = 150;
+    const DEFAULT_TANK_DIRECTION = Canvas::CODE_UP_ARROW;
     
-    public function __construct(\stdClass $tank)
+    public function __construct()
     {
-        $this->setId($tank->id);
+        $this->setId(Guid::newRef());
         $this->setStatus(Tank::ALIVE);
-        $this->setX($tank->x);
-        $this->setY($tank->y);
-        $this->setDirection($tank->newd);
+        $this->setX(self::DEFAULT_TANK_CORS_X);
+        $this->setY(self::DEFAULT_TANK_CORS_X);
+        $this->setDirection(self::DEFAULT_TANK_DIRECTION);
     }
     
     public function moveTank() {
@@ -52,7 +55,7 @@ class Tank
     /**
      * @param mixed $id
      */
-    public function setId(string $id)
+    protected function setId(string $id)
     {
         $this->id = (string)$id;
     }

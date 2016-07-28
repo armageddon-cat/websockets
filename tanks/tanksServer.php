@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace Tanks;
+use Validators\GuidValidator;
 use WebSocket\WebSocket;
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -26,9 +27,11 @@ while (true) {
             /** @var resource $connect */
             $ws = new WebSocket($connect);
             $info = $ws->handshake();
+            
             if ($info) {
                 $connects[] = $connect;//добавляем его в список необходимых для обработки
-                onOpen($connect, $info);//вызываем пользовательский сценарий
+                onOpen($connect);//вызываем пользовательский сценарий
+                //  $data = fread($connect, 100000); instead of info to function
             }
         }
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
@@ -57,9 +60,12 @@ fclose($socket);
  * @param resource $connect
  * @param $b
  */
-function onOpen($connect, $data) {
+function onOpen($connect) {
     var_dump('connection opened');
-    // no operations needed to be here
+    $tank = new Tank();
+    TankRegistry::addTank($tank);
+    $dataObject = (string)$tank;
+    fwrite($connect,  WebSocket::encode($dataObject));
 }
 
 function onClose($a) {
@@ -77,12 +83,24 @@ function onClose($a) {
  */
 function onMessage($connect, $data) {
     var_dump('Someone Came');
+    var_dump('$data');
+    var_dump($data);
     $decmessage = WebSocket::decode($data);
+    var_dump('$decmessage');
+    var_dump($decmessage);
     $dataObject = json_decode($decmessage['payload']);
     if ($dataObject === null) {
         var_dump('wrong data');
         var_dump(json_last_error_msg());
-        return false;
+        return true;
+    }
+    if (empty($dataObject->id) || !GuidValidator::validate($dataObject->id)) {
+        var_dump('tank id not defined');
+        return true;
+    }
+    if (!TankRegistry::checkTank($dataObject->id)) {
+        var_dump('tank does not exist');
+        return true;
     }
     if (isset($dataObject->type) && $dataObject->type === 'bullet') {
         if (!BulletRegistry::checkBullet($dataObject->id)) {
@@ -96,16 +114,9 @@ function onMessage($connect, $data) {
 //    var_dump($decmessage['payload']);
 //    var_dump('$dataObject');
 //    var_dump($dataObject);
-    if (!TankRegistry::checkTank($dataObject->id)) {
-        $tank = new Tank($dataObject);
-        TankRegistry::addTank($tank);
-    } else {
-        $tank = TankRegistry::getTank($dataObject->id);
-        if (!empty($dataObject->newd)) {
-            $tank->setDirection($dataObject->newd); // todo refactor
-        }
-    }
+    $tank = TankRegistry::getTank($dataObject->id);
     if (!empty($dataObject->newd)) {
+        $tank->setDirection($dataObject->newd); // todo refactor
         $tank->moveTank(); // todo refactor
     }
     $bullets = BulletRegistry::getStorage();

@@ -32,19 +32,22 @@
         ROTATE_CLOCKWISE = RAD_TO_DEG*90;
         ROTATE_OPPOSITE = RAD_TO_DEG*180;
         TANK_STEP = 10;
-        GUID = createGuid();
         TANK_DEAD = 0;
         TANK_ALIVE = 1;
         BULLET_SIZE = 10;
         BULLET_DELAY = 20;
         BULLET_STEP = 10;
+        GUID = 'undefined';
         
 //        var socket = new WebSocket("ws://127.0.0.1:8000");
         var socket = new WebSocket("ws://185.154.13.92:8124");
-        tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
+//        tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
+        //newClient = {'type':'newclient'};
         socket.onopen = function () {
             console.log("socket opened v2");
-            socket.send(JSON.stringify(tankDataSingle));
+//            socket.send(JSON.stringify(tankDataSingle));
+//            socket.send(JSON.stringify(newClient));
+//            socket.send('hello');
         };
         tankData = [];
         
@@ -57,7 +60,11 @@
         canvasContext.drawImage(img, IMAGE_OFFSET_X, IMAGE_OFFSET_Y);
         currentDirectionCode = CODE_LEFT_ARROW;
         window.addEventListener('keydown', function (e) {
-            if (e.keyCode === CODE_ENTER) { // not arrow
+            if (!(/[0-9abcdef]{8}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{12}/i.test(GUID))) {
+                console.log("GUID undefined"); // TODO remove debug!!
+                return;
+            }
+            if (e.keyCode === CODE_ENTER) { // enter button pushed
                 console.log("enter code");
                 socket.send(JSON.stringify({'id': GUID, 'type':'bullet'}));
                 return;
@@ -67,13 +74,31 @@
                 return;
             }
             tempTankData = {'id': GUID, 'newd':e.keyCode};
+            console.log("tempTankDataBeforeSend"); // TODO remove debug!!
+            console.log(JSON.stringify(tempTankData)); // TODO remove debug!!
             socket.send(JSON.stringify(tempTankData));
         });
 
         socket.onmessage = function (event) {
-            tankData = JSON.parse(event.data);
+            console.log("event"); // TODO remove debug!!
+            console.log(event); // TODO remove debug!!
+            var tempTankData = JSON.parse(event.data);
+            console.log("tempTankData"); // TODO remove debug!!
+            console.log(tempTankData); // TODO remove debug!!
+            if (!Array.isArray(tempTankData)) {
+                // onopen user
+                GUID = tempTankData.id;
+                console.log("newuser"); // TODO remove debug!!
+                tankData.push(event.data);
+            } else {
+                tankData = tempTankData;
+            }
+            console.log("tankData"); // TODO remove debug!!
+            console.log(tankData); // TODO remove debug!!
             canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
             tankData.forEach(function(item, index) {
+                console.log("item"); // TODO remove debug!!
+                console.log(item); // TODO remove debug!!
                 var currentTankDataParsed = JSON.parse(item);
                 console.log("item.id"+currentTankDataParsed.id);
                 console.log("GUID"+GUID);
