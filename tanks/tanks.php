@@ -31,103 +31,64 @@
         ROTATE_COUNTERCLOCKWISE = RAD_TO_DEG*270;
         ROTATE_CLOCKWISE = RAD_TO_DEG*90;
         ROTATE_OPPOSITE = RAD_TO_DEG*180;
-        TANK_STEP = 10;
         TANK_DEAD = 0;
-        TANK_ALIVE = 1;
         BULLET_SIZE = 10;
         BULLET_DELAY = 20;
         BULLET_STEP = 10;
         GUID = 'undefined';
+        tankData = [];
         
 //        var socket = new WebSocket("ws://127.0.0.1:8000");
         var socket = new WebSocket("ws://185.154.13.92:8124");
-//        tankDataSingle = {'id': GUID,'currentd':37,'newd':38,'x':IMAGE_OFFSET_X,'y':IMAGE_OFFSET_Y};
-        //newClient = {'type':'newclient'};
         socket.onopen = function () {
-            console.log("socket opened v2");
-//            socket.send(JSON.stringify(tankDataSingle));
-//            socket.send(JSON.stringify(newClient));
-//            socket.send('hello');
+            console.log("socket opened");
         };
-        tankData = [];
         
         var canvas = document.getElementById('canvas');
         var canvasContext = canvas.getContext('2d');
         canvasContext.save();
-//        canvasContext.fillStyle = "#4D4E53";
-//        canvasContext.fillRect(IMAGE_OFFSET_X, IMAGE_OFFSET_Y, SIZE_IMAGE, SIZE_IMAGE);
-//        canvasContext.clearRect(IMAGE_OFFSET_X+10,IMAGE_OFFSET_Y+10,SIZE_IMAGE/10,SIZE_IMAGE/10);
         canvasContext.drawImage(img, IMAGE_OFFSET_X, IMAGE_OFFSET_Y);
         currentDirectionCode = CODE_LEFT_ARROW;
         window.addEventListener('keydown', function (e) {
             if (!(/[0-9abcdef]{8}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{12}/i.test(GUID))) {
-                console.log("GUID undefined"); // TODO remove debug!!
                 return;
             }
             if (e.keyCode === CODE_ENTER) { // enter button pushed
-                console.log("enter code");
                 socket.send(JSON.stringify({'id': GUID, 'type':'bullet'}));
                 return;
             }
             if (CODE_ARROWS.indexOf(e.keyCode) === -1) { // not arrow
-                console.log("not arrow");
                 return;
             }
-            tempTankData = {'id': GUID, 'newd':e.keyCode};
-            console.log("tempTankDataBeforeSend"); // TODO remove debug!!
-            console.log(JSON.stringify(tempTankData)); // TODO remove debug!!
-            socket.send(JSON.stringify(tempTankData));
+            socket.send(JSON.stringify({'id': GUID, 'newd':e.keyCode}));
         });
 
         socket.onmessage = function (event) {
-            console.log("event"); // TODO remove debug!!
-            console.log(event); // TODO remove debug!!
             var tempTankData = JSON.parse(event.data);
-            console.log("tempTankData"); // TODO remove debug!!
-            console.log(tempTankData); // TODO remove debug!!
             if (!Array.isArray(tempTankData)) {
                 // onopen user
                 GUID = tempTankData.id;
-                console.log("newuser"); // TODO remove debug!!
                 tankData.push(event.data);
             } else {
                 tankData = tempTankData;
             }
-            console.log("tankData"); // TODO remove debug!!
-            console.log(tankData); // TODO remove debug!!
             canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
-            tankData.forEach(function(item, index) {
-                console.log("item"); // TODO remove debug!!
-                console.log(item); // TODO remove debug!!
+            tankData.forEach(function(item) {
                 var currentTankDataParsed = JSON.parse(item);
-                console.log("item.id"+currentTankDataParsed.id);
-                console.log("GUID"+GUID);
-                console.log("tankstatus="+currentTankDataParsed.status); // TODO remove debug!!
                 if (currentTankDataParsed.status == TANK_DEAD) {
-                    console.log("tankdead"); // TODO remove debug!!
                     return;
                 }
-                console.log("tankalive"); // TODO remove debug!!
                 if(currentTankDataParsed.id == GUID) {
                     currentDirectionCode = currentTankDataParsed.direction;
-                    IMAGE_OFFSET_X = currentTankDataParsed.x;
-                    IMAGE_OFFSET_Y = currentTankDataParsed.y;
-                    console.log('currentDirectionCode'+currentDirectionCode);
-                    console.log('IMAGE_OFFSET_X'+IMAGE_OFFSET_X);
-                    console.log('IMAGE_OFFSET_Y'+IMAGE_OFFSET_Y);
                 }
-                tankLogic(currentTankDataParsed, index);
+                tankLogic(currentTankDataParsed);
             });
             
         };
-        function tankLogic(currentTankData, index) {
-            console.log("currentTankData"); // TODO remove debug!!
-            console.log(currentTankData); // TODO remove debug!!
-            console.log('currentTankData x='+currentTankData.x+'y='+currentTankData.y); // TODO remove debug!!
+        function tankLogic(currentTankData) {
             recalcTranslate(currentTankData);
             canvasContext.save();
             canvasContext.translate(TRANSLATE_VALUE_X, TRANSLATE_VALUE_Y);
-            console.log("trans xy neg xy. x="+TRANSLATE_VALUE_X+'y='+TRANSLATE_VALUE_Y+'mx='+TRANSLATE_VALUE_NEGATIVE_X+'my='+TRANSLATE_VALUE_NEGATIVE_Y+'end'); // TODO remove debug!!
             if (currentTankData.direction == CODE_LEFT_ARROW) {
             }
             if (currentTankData.direction == CODE_UP_ARROW) {
@@ -140,52 +101,38 @@
                 canvasContext.rotate(ROTATE_COUNTERCLOCKWISE);
             }
             canvasContext.translate(TRANSLATE_VALUE_NEGATIVE_X, TRANSLATE_VALUE_NEGATIVE_Y);
-            console.log("trans neg x y = "+TRANSLATE_VALUE_NEGATIVE_X+TRANSLATE_VALUE_NEGATIVE_Y+'tank xy='+currentTankData.x+currentTankData.y); // TODO remove debug!!
             canvasContext.drawImage(img, currentTankData.x, currentTankData.y);
             canvasContext.restore();
-            //--------------------bullet logic-------------------------------------
-            console.log("currentTankData"); // TODO remove debug!!
-            console.log(currentTankData); // TODO remove debug!!
+            //--------------------bullet animation-------------------------------------
             if (currentTankData.bullet && currentTankData.bullet != '' && currentTankData.bullet != null) {
                 currentTankData.bullet = JSON.parse(currentTankData.bullet);
                 canvasContext.fillStyle = "#4D4E53";
                 bofsetx = TRANSLATE_VALUE_X;
                 bofsety = TRANSLATE_VALUE_Y;
-                console.log("currentDirectionCode"+currentDirectionCode);
                 var intervalID = setInterval(bulletMove, BULLET_DELAY, currentTankData);
                 function bulletMove(currentTankDataInside) {
-                    console.log("bdirection2"+currentTankDataInside.direction);
                     canvasContext.clearRect(currentTankDataInside.bullet.x,currentTankDataInside.bullet.y,BULLET_SIZE,BULLET_SIZE);
-                    console.log('currentTankDataInside.bullet.x'+currentTankDataInside.bullet.x+'currentTankDataInside.bullet.y'+currentTankDataInside.bullet.y);
                     if (currentTankDataInside.direction == CODE_LEFT_ARROW) {
                         currentTankDataInside.bullet.x-=BULLET_STEP;
                     }
-                    console.log("currentTankDataInside.direction3"+currentTankDataInside.direction);
                     if (currentTankDataInside.direction == CODE_UP_ARROW) {
                         currentTankDataInside.bullet.y-=BULLET_STEP;
                     }
-                    console.log("currentTankDataInside.direction4"+currentTankDataInside.direction);
                     if (currentTankDataInside.direction == CODE_RIGHT_ARROW) {
                         currentTankDataInside.bullet.x+=BULLET_STEP;
                     }
-                    console.log("currentTankDataInside.direction5"+currentTankDataInside.direction);
                     if (currentTankDataInside.direction == CODE_DOWN_ARROW) {
                         currentTankDataInside.bullet.y+=BULLET_STEP;
                     }
-                    console.log("currentTankDataInside.direction6"+currentTankDataInside.direction);
-                    console.log("bullet");
-                    console.log("currentTankDataInside.direction7"+currentTankDataInside.direction);
-                    console.log('currentTankDataInside.bullet.x'+currentTankDataInside.bullet.x+'currentTankDataInside.bullet.y'+currentTankDataInside.bullet.y+'BULLET_SIZE'+BULLET_SIZE+'BULLET_SIZE'+BULLET_SIZE);
                     canvasContext.fillRect(currentTankDataInside.bullet.x, currentTankDataInside.bullet.y, BULLET_SIZE, BULLET_SIZE);
-                    console.log("currentTankDataInside.direction8"+currentTankDataInside.direction);
                 }
+                var timend = 0;
                 if (currentDirectionCode == CODE_LEFT_ARROW || currentDirectionCode == CODE_RIGHT_ARROW) {
-                    var timend = ((SIZE_CANVAS - currentTankData.bullet.x) / BULLET_STEP) * BULLET_DELAY;
+                    timend = ((SIZE_CANVAS - currentTankData.bullet.x) / BULLET_STEP) * BULLET_DELAY;
                 }
                 if (currentDirectionCode == CODE_UP_ARROW || currentDirectionCode == CODE_DOWN_ARROW) {
-                    var timend = ((SIZE_CANVAS - currentTankData.bullet.y) / BULLET_STEP) * BULLET_DELAY;
+                    timend = ((SIZE_CANVAS - currentTankData.bullet.y) / BULLET_STEP) * BULLET_DELAY;
                 }
-                console.log("timend"+timend);
                 setTimeout(function() { clearInterval(intervalID); }, timend);
             }
         }
@@ -196,22 +143,6 @@
             TRANSLATE_VALUE_NEGATIVE_X = -(currentTankData.x+SIZE_IMAGE*0.5);
             TRANSLATE_VALUE_NEGATIVE_Y = -(currentTankData.y+SIZE_IMAGE*0.5);
         }
-
-        function createGuid()
-        {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
-                return v.toString(16);
-            });
-        }
-
-        function findTank(element) {
-            if (element.id == GUID) {
-                return true;
-            }
-            return false;
-        }
-
     </script>
 </body>
 </html>
