@@ -11,14 +11,16 @@ if (!$socket) {
     die("$errstr ($errno)\n");
 }
 $connects = array();
+$i=0;
 while (true) {
     //формируем массив прослушиваемых сокетов:
     $read   = $connects;
     $read[] = $socket;
     $write  = $except = null;
     
-    if (!stream_select($read, $write, $except, null)) {//ожидаем сокеты доступные для чтения (без таймаута)
-        break;
+    if (!stream_select($read, $write, $except, 0, 100000)) {//ожидаем сокеты доступные для чтения (без таймаута)
+//        var_dump('lamda'.$i++);
+       // break;
     }
     
     if (in_array($socket, $read)) {//есть новое соединение
@@ -37,21 +39,26 @@ while (true) {
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
     }
     
-    foreach($read as $connect) {//обрабатываем все соединения
-        $data = fread($connect, 100000);
-        if (!$data) { //соединение было закрыто
-            fclose($connect);
-            unset($connects[array_search($connect, $connects)]);
-            onClose($connect);//вызываем пользовательский сценарий
+    foreach($read as $currentConnect) {//обрабатываем все соединения
+        $data = fread($currentConnect, 100000);
+        if (!strlen($data)) { //соединение было закрыто
+            fclose($currentConnect);
+            unset($connects[array_search($currentConnect, $connects)]);
+            onClose($currentConnect);//вызываем пользовательский сценарий
             continue;
         }
-        
-        foreach ($connects as $currentConnect) {
-            if (!empty($data)) {
-                onMessage($currentConnect, $data);//вызываем пользовательский сценарий
-            }
-        }
+    
+        onMessage($currentConnect, $data);//вызываем пользовательский сценарий
     }
+    foreach($connects as $Cconnect) {//обрабатываем все соединения
+        $storage = TankRegistry::getStorageJSON();
+        $encmessage = WebSocket::encode($storage);
+        fwrite($Cconnect, $encmessage);
+    }
+//    fwrite($connect, WebSocket::encode('hello'));
+    
+//    var_dump('test'.$i++);
+    
 }
 
 fclose($socket);
@@ -82,7 +89,7 @@ function onClose($a) {
  * @return bool
  */
 function onMessage($connect, $data) {
-    var_dump('Someone Came');
+    //var_dump('Someone Came');
     $decmessage = WebSocket::decode($data);
 //    var_dump('$decmessage');
 //    var_dump($decmessage);
