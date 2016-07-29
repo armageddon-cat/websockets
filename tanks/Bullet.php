@@ -57,13 +57,20 @@ class Bullet
         $direction = $this->getDirection();
         $tank = $this->getTank();
         $startPosition = 0;
+        $endPosition = 0;
         if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
             $startPosition = $tank->getTankBarrelX();
         }
         if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
             $startPosition = $tank->getTankBarrelY();
         }
-        $this->path = range($startPosition, Canvas::CANVAS_SIZE);
+        if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
+            $endPosition = Canvas::CANVAS_START;
+        }
+        if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
+            $endPosition = Canvas::CANVAS_SIZE;
+        }
+        $this->path = range($startPosition, $endPosition);
     }
     
     public function getBulletPositionByTime($startTime, $position, $direction)
@@ -79,6 +86,7 @@ class Bullet
     public function checkIntersection()
     {
 //        var_dump('checkIntersectionstart');
+//        var_dump(json_encode($this->getPath()));
         $direction = $this->getDirection();
         $tanks = TankRegistry::getStorage();
         /** @var Tank $tank */
@@ -87,7 +95,7 @@ class Bullet
                 continue;
             }
             if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
-                for ($i = -20; $i < 21; $i++) { // intersection area = tank center +- 20
+                for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
 //                    var_dump($tank->getTankCenterY());
 //                    var_dump($tank->getTankCenterY()+$i);
 //                    var_dump($tank->getTankCenterX()+$i);
@@ -100,7 +108,7 @@ class Bullet
                 }
             }
             if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
-                for ($i = -20; $i < 21; $i++) { // intersection area = tank center +- 20
+                for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
                     if ($tank->getTankCenterX()+$i == $this->getX() && in_array($tank->getTankCenterY()+$i, $this->getPath())) {
                         $tank->setStatus(Tank::DEAD);
                         break;

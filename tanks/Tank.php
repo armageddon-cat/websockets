@@ -12,6 +12,7 @@ class Tank
     private $bullet;
     const TANK_STEP = 10;
     const TANK_SIZE = 100;
+    const TANK_HIT_AREA = 20;
     const DEAD = 0;
     const ALIVE = 1;
     const TANK_BARREL_OFFSET_VALUE = 60;

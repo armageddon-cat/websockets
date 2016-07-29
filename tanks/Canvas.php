@@ -5,6 +5,7 @@ namespace Tanks;
 
 class Canvas
 {
+    const CANVAS_START = 0;
     const CANVAS_SIZE = 400;
     const CODE_LEFT_ARROW = 37;
     const CODE_UP_ARROW = 38;

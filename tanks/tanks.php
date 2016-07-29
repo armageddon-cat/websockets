@@ -73,6 +73,8 @@
                 tankData = tempTankData;
             }
             canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
+            console.log("tankData"); // TODO remove debug!!
+            console.log(tankData); // TODO remove debug!!
             tankData.forEach(function(item) {
                 var currentTankDataParsed = JSON.parse(item);
                 if (currentTankDataParsed.status == TANK_DEAD) {

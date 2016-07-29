@@ -83,11 +83,9 @@ function onClose($a) {
  */
 function onMessage($connect, $data) {
     var_dump('Someone Came');
-    var_dump('$data');
-    var_dump($data);
     $decmessage = WebSocket::decode($data);
-    var_dump('$decmessage');
-    var_dump($decmessage);
+//    var_dump('$decmessage');
+//    var_dump($decmessage);
     $dataObject = json_decode($decmessage['payload']);
     if ($dataObject === null) {
         var_dump('wrong data');
@@ -110,18 +108,12 @@ function onMessage($connect, $data) {
             $tankBullet->setBullet($bullet);
         }
     }
-//    var_dump('$decmessage');
-//    var_dump($decmessage['payload']);
-//    var_dump('$dataObject');
-//    var_dump($dataObject);
     $tank = TankRegistry::getTank($dataObject->id);
     if (!empty($dataObject->newd)) {
         $tank->setDirection($dataObject->newd); // todo refactor
         $tank->moveTank(); // todo refactor
     }
     $bullets = BulletRegistry::getStorage();
-//    var_dump('$bullets');
-//    var_dump($bullets);
     if (count($bullets) !== 0) {
         /** @var Bullet $bullet */
         foreach ($bullets as $bullet) {
@@ -129,8 +121,6 @@ function onMessage($connect, $data) {
             BulletRegistry::removeBullet($bullet->getId());
         }
     }
-//    var_dump('$tank');
-//    var_dump($tank);
     $storage = TankRegistry::getStorageJSON();
     // after shooting and checking intesection. save tank state. and now we can unset bullets
     if (count($bullets) !== 0) {
@@ -138,11 +128,9 @@ function onMessage($connect, $data) {
         BulletRegistry::unsetStorage();
     }
     BulletRegistry::unsetStorage();
-    var_dump('$storage');
-    var_dump($storage);
-    $storage1 = TankRegistry::getStorageJSON();
-    var_dump('$storage1');
-    var_dump($storage1);
+//    $storage1 = TankRegistry::getStorageJSON();
+//    var_dump('$storage1');
+//    var_dump($storage1);
     $encmessage = WebSocket::encode($storage);
     fwrite($connect, $encmessage);
 }
