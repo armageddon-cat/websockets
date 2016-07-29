@@ -38,22 +38,28 @@ while (true) {
         }
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
     }
-    
-    foreach($read as $currentConnect) {//обрабатываем все соединения
-        $data = fread($currentConnect, 100000);
-        if (!strlen($data)) { //соединение было закрыто
-            fclose($currentConnect);
-            unset($connects[array_search($currentConnect, $connects)]);
-            onClose($currentConnect);//вызываем пользовательский сценарий
-            continue;
+    if (!empty($read)) {
+        foreach($read as $currentConnect) {//обрабатываем все соединения
+            $data = fread($currentConnect, 100000);
+            if (!strlen($data)) { //соединение было закрыто
+                fclose($currentConnect);
+                unset($connects[array_search($currentConnect, $connects)]);
+                onClose($currentConnect);//вызываем пользовательский сценарий
+                continue;
+            }
+        
+            onMessage($currentConnect, $data);//вызываем пользовательский сценарий
         }
-    
-        onMessage($currentConnect, $data);//вызываем пользовательский сценарий
-    }
-    foreach($connects as $Cconnect) {//обрабатываем все соединения
-        $storage = TankRegistry::getStorageJSON();
-        $encmessage = WebSocket::encode($storage);
-        fwrite($Cconnect, $encmessage);
+        usleep(200000);
+    } else {
+        $k=0;
+        foreach($connects as $Cconnect) {//обрабатываем все соединения
+            $storage = TankRegistry::getStorageJSON();
+            $encmessage = WebSocket::encode($storage);
+//            fwrite($Cconnect, WebSocket::encode('hello'.$k++));
+            fwrite($Cconnect, $encmessage);
+        }
+        usleep(200000);
     }
 //    fwrite($connect, WebSocket::encode('hello'));
     
