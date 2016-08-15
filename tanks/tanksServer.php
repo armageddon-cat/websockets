@@ -39,6 +39,7 @@ while (true) {
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
     }
     if (!empty($read)) {
+        $serverTime = \DateTime::createFromFormat('U.u', microtime(true)); // create time with microseconds
         foreach($read as $currentConnect) {//обрабатываем все соединения
             $data = fread($currentConnect, 100000);
             if (!strlen($data)) { //соединение было закрыто
@@ -48,7 +49,7 @@ while (true) {
                 continue;
             }
         
-            onMessage($currentConnect, $data);//вызываем пользовательский сценарий
+            onMessage($currentConnect, $data, $serverTime);//вызываем пользовательский сценарий
         }
         usleep(200000);
     } else {
@@ -75,7 +76,8 @@ fclose($socket);
  */
 function onOpen($connect) {
     var_dump('connection opened');
-    $tank = new Tank();
+    $now = \DateTime::createFromFormat('U.u', microtime(true)); // create time with microseconds
+    $tank = new Tank($now);
     TankRegistry::addTank($tank);
     $dataObject = (string)$tank;
     fwrite($connect,  WebSocket::encode($dataObject));
@@ -94,7 +96,7 @@ function onClose($a) {
  *
  * @return bool
  */
-function onMessage($connect, $data) {
+function onMessage($connect, $data, $serverTime) {
     //var_dump('Someone Came');
     $decmessage = WebSocket::decode($data);
 //    var_dump('$decmessage');
@@ -124,6 +126,13 @@ function onMessage($connect, $data) {
     $tank = TankRegistry::getTank($dataObject->id);
     if (!empty($dataObject->newd)) {
         $tank->setDirection($dataObject->newd); // todo refactor
+        $clientTime = \DateTime::createFromFormat('U.u', str_replace(',', '.', $dataObject->time/1000));
+        $interval = $clientTime->diff($serverTime);
+        $time = $serverTime;
+        if ((int)$interval->format('%Y%m%d%H%m%s') === 0) { // if difference more than 1 second use server time
+            $time = $clientTime;
+        }
+        $tank->setTime($time);
         $tank->moveTank(); // todo refactor
     }
     $bullets = BulletRegistry::getStorage();

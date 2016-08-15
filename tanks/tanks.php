@@ -63,13 +63,13 @@
                 return;
             }
             if (e.keyCode === CODE_ENTER) { // enter button pushed
-                socket.send(JSON.stringify({'id': GUID, 'type':'bullet'}));
+                socket.send(JSON.stringify({'id': GUID, 'type':'bullet', 'time':Date.now()}));
                 return;
             }
             if (CODE_ARROWS.indexOf(e.keyCode) === -1) { // not arrow
                 return;
             }
-            buffer = JSON.stringify({'id': GUID, 'newd':e.keyCode});
+            buffer = JSON.stringify({'id': GUID, 'newd':e.keyCode, 'time':Date.now()});
         });
 
         socket.onmessage = function (event) {

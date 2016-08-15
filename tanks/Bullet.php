@@ -8,11 +8,15 @@ class Bullet
     private $id;
     private $direction;
     private $path; // in future must be an object made by DI
+    private $pathTime; // in future must be an object made by DI
     private $tank;
     private $x;
     private $y;
+    private $shootTime; // 'U.u' make object in future
     const BULLET_STEP = 10; // pixel
     const BULLET_DELAY = 500; // milliseconds (thousandths of a second)
+    const BULLET_DELAY_MICROSECONDS = self::BULLET_DELAY * 1000; // microseconds
+    const BULLET_DELAY_SECONDS = self::BULLET_DELAY / 1000; // seconds
     const BULLET_SIZE = 10;
     
     public function __construct(\stdClass $object)
@@ -23,6 +27,7 @@ class Bullet
         $this->setPath();
         $this->setX($this->getTank()->getTankBarrelX());
         $this->setY($this->getTank()->getTankBarrelY());
+        $this->setShootTime($object->time);
     }
     
     /**
@@ -73,9 +78,13 @@ class Bullet
         $this->path = range($startPosition, $endPosition);
     }
     
-    public function getBulletPositionByTime($startTime, $position, $direction)
+    public function getBulletPositionByTime($time)
     {
-        
+//        $result = array();
+//        foreach ($this->getPath() as $path) {
+//            $result[$path] = (float)$this->getShootTime() + self::BULLET_DELAY_SECONDS;
+//        }
+//        return $result;
     }
     
     public function bulletTrajectory($startPosition, $direction)
@@ -101,6 +110,10 @@ class Bullet
 //                    var_dump($tank->getTankCenterX()+$i);
 //                    var_dump($this->getY());
                     if ($tank->getTankCenterY()+$i == $this->getY() && in_array($tank->getTankCenterX()+$i, $this->getPath())) {
+                        $time = $this->getPathTime()[$tank->getTankCenterX()+$i];
+                        if ($tank->getTime() == $time || $tank->getTime() == $time+500 || $tank->getTime() == $time-500) { // make interval for time
+                        }
+                        $tank->getTime() === $this->getShootTime;
 //                        var_dump('tankstatusupdated');
                         $tank->setStatus(Tank::DEAD);
                         break;
@@ -118,6 +131,8 @@ class Bullet
         }
 //        var_dump('checkIntersectionend');
     }
+    
+    
     
     /**
      * @return string
@@ -200,5 +215,39 @@ class Bullet
             $result[$key] = $value;
         }
         return json_encode($result);
+    }
+    
+    /**
+     * @return string
+     */
+    public function getShootTime() : string
+    {
+        return (string)$this->shootTime;
+    }
+    
+    /**
+     * @param string $shootTime
+     */
+    public function setShootTime(string $shootTime)
+    {
+        $this->shootTime = (string)$shootTime;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getPathTime() : array
+    {
+        return (array)$this->pathTime;
+    }
+    
+    /**
+     * @internal param array $pathTime
+     */
+    public function setPathTime()
+    {
+        foreach ($this->getPath() as $path) {
+            $this->pathTime[$path] = (float)$this->getShootTime() + self::BULLET_DELAY_SECONDS;
+        }
     }
 }

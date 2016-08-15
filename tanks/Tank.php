@@ -10,6 +10,7 @@ class Tank
     private $direction;
     private $status;
     private $bullet;
+    private $time; // 'U.u'
     const TANK_STEP = 10;
     const TANK_SIZE = 100;
     const TANK_HIT_AREA = 20;
@@ -20,13 +21,14 @@ class Tank
     const DEFAULT_TANK_CORS_Y = 150;
     const DEFAULT_TANK_DIRECTION = Canvas::CODE_UP_ARROW;
     
-    public function __construct()
+    public function __construct($time)
     {
         $this->setId(Guid::newRef());
         $this->setStatus(Tank::ALIVE);
         $this->setX(self::DEFAULT_TANK_CORS_X);
         $this->setY(self::DEFAULT_TANK_CORS_X);
         $this->setDirection(self::DEFAULT_TANK_DIRECTION);
+        $this->setTime($time);
     }
     
     public function moveTank() {
@@ -221,5 +223,21 @@ class Tank
     {
         $tankBarrel = $this->getTankCenterY() + $this->calculateOffset(Canvas::AXIS_Y);
         return (int)$tankBarrel;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getTime() : string
+    {
+        return (string)$this->time;
+    }
+    
+    /**
+     * @param string $time
+     */
+    public function setTime(string $time)
+    {
+        $this->time = (string)$time;
     }
 }
