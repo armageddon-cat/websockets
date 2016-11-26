@@ -5,6 +5,8 @@
  * Date: 16.06.2016
  * Time: 15:24
  */
+use WebSocket\WebSocket;
+
 include_once __DIR__ . DIRECTORY_SEPARATOR . '../WebSocket.php';
 
 //$socket   = stream_socket_server('tcp://127.0.0.1:8000', $errno, $errstr);
@@ -51,16 +53,16 @@ while (true) {
 fclose($socket);
 
 /**
- * @param resource $connect
- * @param $b
+ * @internal param resource $connect
+ * @internal param $b
  */
-function onOpen($connect, $b) {
+function onOpen() {
     var_dump('connection opened');
 //    $ws = new WebSocket($connect);
 //    fwrite($connect, (new WebSocket($connect))->encode('Привет'));
 }
 
-function onClose($a) {
+function onClose() {
     var_dump('connection lost, sorian');
 }
 

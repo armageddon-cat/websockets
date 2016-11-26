@@ -21,7 +21,7 @@ class Tank
     const DEFAULT_TANK_CORS_Y = 150;
     const DEFAULT_TANK_DIRECTION = Canvas::CODE_UP_ARROW;
     
-    public function __construct($time)
+    public function __construct(\DateTime $time)
     {
         $this->setId(Guid::newRef());
         $this->setStatus(Tank::ALIVE);
@@ -234,10 +234,10 @@ class Tank
     }
     
     /**
-     * @param string $time
+     * @param \DateTime $time
      */
-    public function setTime(string $time)
+    public function setTime(\DateTime $time)
     {
-        $this->time = (string)$time;
+        $this->time = (string)$time; // todo store in correct format
     }
 }

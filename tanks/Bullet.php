@@ -113,7 +113,7 @@ class Bullet
                         $time = $this->getPathTime()[$tank->getTankCenterX()+$i];
                         if ($tank->getTime() == $time || $tank->getTime() == $time+500 || $tank->getTime() == $time-500) { // make interval for time
                         }
-                        $tank->getTime() === $this->getShootTime;
+                        $tank->getTime() === $this->getShootTime(); // todo end this part
 //                        var_dump('tankstatusupdated');
                         $tank->setStatus(Tank::DEAD);
                         break;

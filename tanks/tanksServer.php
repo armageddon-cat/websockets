@@ -11,7 +11,7 @@ if (!$socket) {
     die("$errstr ($errno)\n");
 }
 $connects = array();
-$i=0;
+//$i=0;
 while (true) {
     //формируем массив прослушиваемых сокетов:
     $read   = $connects;
@@ -53,7 +53,7 @@ while (true) {
         }
         usleep(200000);
     } else {
-        $k=0;
+//        $k=0;
         foreach($connects as $Cconnect) {//обрабатываем все соединения
             $storage = TankRegistry::getStorageJSON();
             $encmessage = WebSocket::encode($storage);
@@ -72,7 +72,6 @@ fclose($socket);
 
 /**
  * @param resource $connect
- * @param $b
  */
 function onOpen($connect) {
     var_dump('connection opened');
@@ -83,25 +82,31 @@ function onOpen($connect) {
     fwrite($connect,  WebSocket::encode($dataObject));
 }
 
-function onClose($a) {
+function onClose() {
     var_dump('connection lost, sorian');
-    // infuture maybe unset tank here
+    // todo in future maybe unset tank here
 }
 
 /**
  * everyone send only its data
  *
- * @param resource $connect
- * @param          $data
+ * @param resource  $connect
+ * @param           $data
+ *
+ * @param \DateTime $serverTime
  *
  * @return bool
  */
-function onMessage($connect, $data, $serverTime) {
+function onMessage($connect, $data, \DateTime $serverTime) {
     //var_dump('Someone Came');
-    $decmessage = WebSocket::decode($data);
-//    var_dump('$decmessage');
-//    var_dump($decmessage);
-    $dataObject = json_decode($decmessage['payload']);
+    $decMessage = WebSocket::decode($data);
+    if (!$decMessage) {
+        var_dump('cannot decode data');
+        return true;
+    }
+//    var_dump('$decMessage');
+//    var_dump($decMessage);
+    $dataObject = json_decode($decMessage['payload']);
     if ($dataObject === null) {
         var_dump('wrong data');
         var_dump(json_last_error_msg());

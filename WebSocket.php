@@ -64,7 +64,7 @@ class WebSocket
     /**
      * @param $data
      *
-     * @return array
+     * @return array|bool
      */
     public static function decode($data)
     {
