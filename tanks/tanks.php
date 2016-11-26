@@ -41,6 +41,14 @@
         
 //        var socket = new WebSocket("ws://127.0.0.1:8000");
         var socket = new WebSocket("ws://185.154.13.92:8124");
+        socket.onclose = function(event) {
+            if (event.wasClean) {
+                alert('Соединение закрыто чисто');
+            } else {
+                alert('Обрыв соединения'); // например, "убит" процесс сервера
+            }
+            console.log('Код: ' + event.code + ' причина: ' + event.reason);
+        };
         socket.onopen = function () {
             console.log("socket opened");
         };
