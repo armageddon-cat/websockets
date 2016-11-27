@@ -5,5 +5,9 @@
       "WebSocket\\": "",
       "Validators\\": "tanks/Validators/"
     }
+  },
+  "require-dev": {
+    "phpmd/phpmd" : "@stable",
+    "squizlabs/php_codesniffer": "3.0.0RC1"
   }
 }
