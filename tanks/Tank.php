@@ -143,9 +143,8 @@ class Tank
                 if ($value instanceof \DateTime) {
                     $result[$key] = $value->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS_SHORT);
                 } else {
-                    if (!($value instanceof TankMoveRoute)) {
-                        $result[$key] = (string)$value;
-                    }
+                    if ($value instanceof TankMoveRoute) continue;
+                    $result[$key] = (string)$value;
                 }
             }
         }

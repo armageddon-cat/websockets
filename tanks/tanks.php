@@ -33,7 +33,7 @@
         ROTATE_OPPOSITE = RAD_TO_DEG*180;
         TANK_DEAD = 0;
         BULLET_SIZE = 10;
-        BULLET_DELAY = 20;
+        BULLET_DELAY = 300;
         BULLET_STEP = 10;
         GUID = 'undefined';
         tankData = [];
@@ -124,35 +124,35 @@
             canvasContext.restore();
             //--------------------bullet animation-------------------------------------
             if (currentTankData.bullet && currentTankData.bullet != '' && currentTankData.bullet != null) {
+//                console.log("currentTankData.bullet"); // TODO remove debug!!
+//                console.log(currentTankData.bullet); // TODO remove debug!!
                 currentTankData.bullet = JSON.parse(currentTankData.bullet);
                 canvasContext.fillStyle = "#4D4E53";
-                bofsetx = TRANSLATE_VALUE_X;
-                bofsety = TRANSLATE_VALUE_Y;
-                var intervalID = setInterval(bulletMove, BULLET_DELAY, currentTankData);
-                function bulletMove(currentTankDataInside) {
-                    canvasContext.clearRect(currentTankDataInside.bullet.x,currentTankDataInside.bullet.y,BULLET_SIZE,BULLET_SIZE);
-                    if (currentTankDataInside.direction == CODE_LEFT_ARROW) {
-                        currentTankDataInside.bullet.x-=BULLET_STEP;
-                    }
-                    if (currentTankDataInside.direction == CODE_UP_ARROW) {
-                        currentTankDataInside.bullet.y-=BULLET_STEP;
-                    }
-                    if (currentTankDataInside.direction == CODE_RIGHT_ARROW) {
-                        currentTankDataInside.bullet.x+=BULLET_STEP;
-                    }
-                    if (currentTankDataInside.direction == CODE_DOWN_ARROW) {
-                        currentTankDataInside.bullet.y+=BULLET_STEP;
-                    }
-                    canvasContext.fillRect(currentTankDataInside.bullet.x, currentTankDataInside.bullet.y, BULLET_SIZE, BULLET_SIZE);
-                }
-                var timend = 0;
-                if (currentDirectionCode == CODE_LEFT_ARROW || currentDirectionCode == CODE_RIGHT_ARROW) {
-                    timend = ((SIZE_CANVAS - currentTankData.bullet.x) / BULLET_STEP) * BULLET_DELAY;
-                }
-                if (currentDirectionCode == CODE_UP_ARROW || currentDirectionCode == CODE_DOWN_ARROW) {
-                    timend = ((SIZE_CANVAS - currentTankData.bullet.y) / BULLET_STEP) * BULLET_DELAY;
-                }
-                setTimeout(function() { clearInterval(intervalID); }, timend);
+//                var intervalID = setInterval(bulletMove, BULLET_DELAY, currentTankData);
+//                function bulletMove(currentTankDataInside) {
+//                    canvasContext.clearRect(currentTankDataInside.bullet.x,currentTankDataInside.bullet.y,BULLET_SIZE,BULLET_SIZE);
+//                    if (currentTankDataInside.direction == CODE_LEFT_ARROW) {
+//                        currentTankDataInside.bullet.x-=BULLET_STEP;
+//                    }
+//                    if (currentTankDataInside.direction == CODE_UP_ARROW) {
+//                        currentTankDataInside.bullet.y-=BULLET_STEP;
+//                    }
+//                    if (currentTankDataInside.direction == CODE_RIGHT_ARROW) {
+//                        currentTankDataInside.bullet.x+=BULLET_STEP;
+//                    }
+//                    if (currentTankDataInside.direction == CODE_DOWN_ARROW) {
+//                        currentTankDataInside.bullet.y+=BULLET_STEP;
+//                    }
+                    canvasContext.fillRect(currentTankData.bullet.x, currentTankData.bullet.y, BULLET_SIZE, BULLET_SIZE);
+//                }
+//                var timend = 0;
+//                if (currentDirectionCode == CODE_LEFT_ARROW || currentDirectionCode == CODE_RIGHT_ARROW) {
+//                    timend = ((SIZE_CANVAS - currentTankData.bullet.x) / BULLET_STEP) * BULLET_DELAY;
+//                }
+//                if (currentDirectionCode == CODE_UP_ARROW || currentDirectionCode == CODE_DOWN_ARROW) {
+//                    timend = ((SIZE_CANVAS - currentTankData.bullet.y) / BULLET_STEP) * BULLET_DELAY;
+//                }
+//                setTimeout(function() { clearInterval(intervalID); }, timend);
             }
         }
 

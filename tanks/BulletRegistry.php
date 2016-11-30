@@ -60,4 +60,22 @@ class BulletRegistry // todo refactor with iterator
     {
         self::$storage = [];
     }
+    
+    public static function moveBullets()
+    {
+//        var_dump(__FUNCTION__);
+        $bullets = self::getStorage();
+//        var_dump($bullets);
+        foreach ($bullets as $bullet) {
+//            var_dump(__FUNCTION__ . 'foreach');
+            $bullet->move();
+            $bulX = $bullet->getX();
+            $bulY = $bullet->getY();
+            if ($bulX < Canvas::CANVAS_START || $bulX > Canvas::CANVAS_SIZE ||
+                $bulY < Canvas::CANVAS_START || $bulY > Canvas::CANVAS_SIZE) {
+                self::removeBullet($bullet->getId());
+            }
+        }
+    }
+        
 }

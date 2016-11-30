@@ -39,6 +39,7 @@ while (true) {
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
     }
     if (!empty($read)) {
+//        var_dump('if');
         $serverTime = DateTimeUser::createDateTimeMicro();
         foreach($read as $currentConnect) {//обрабатываем все соединения
             $data = fread($currentConnect, 100000);
@@ -54,6 +55,13 @@ while (true) {
         usleep(200000);
     } else {
 //        $k=0;
+//        var_dump('else');
+        $bullets = BulletRegistry::getStorage();
+        foreach ($bullets as $bullet) {
+            $bullet->checkIntersection(); // todo check with currect bullet iteration position
+//            BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
+        }
+        BulletRegistry::moveBullets();
         foreach($connects as $Cconnect) {//обрабатываем все соединения
             $storage = TankRegistry::getStorageJSON();
             $encmessage = WebSocket::encode($storage);
@@ -140,19 +148,18 @@ function onMessage($connect, $data, \DateTime $serverTime) {
         $tank->moveTank($time); // todo refactor
     }
     $bullets = BulletRegistry::getStorage();
-    if (count($bullets) !== 0) {
-        foreach ($bullets as $bullet) {
-            $bullet->checkIntersection();
-            BulletRegistry::removeBullet($bullet->getId());
-        }
+    foreach ($bullets as $bullet) {
+        $bullet->checkIntersection(); // todo check with currect bullet iteration position
+//            BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
     }
+    BulletRegistry::moveBullets();
     $storage = TankRegistry::getStorageJSON();
     // after shooting and checking intesection. save tank state. and now we can unset bullets
     if (count($bullets) !== 0) {
-        TankRegistry::unsetBullets();
-        BulletRegistry::unsetStorage();//todo refactor
+//        TankRegistry::unsetBullets(); // todo too early unsetting bullets
+//        BulletRegistry::unsetStorage();//todo refactor
     }
-    BulletRegistry::unsetStorage();//todo refactor
+//    BulletRegistry::unsetStorage();//todo refactor
 //    $storage1 = TankRegistry::getStorageJSON();
 //    var_dump('$storage1');
 //    var_dump($storage1);

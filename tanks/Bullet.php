@@ -112,20 +112,32 @@ class Bullet
             }
             if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
                 for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
+//                    var_dump('start');
+//                    var_dump('TCY'.$tank->getTankCenterY().'TCX'.$tank->getTankCenterX().
+//                             'TCYi'.($tank->getTankCenterY()+$i).'TCXi'.($tank->getTankCenterX()+$i).
+//                             'BY'.($this->getY()).'BX'.($this->getX()));
+//                    var_dump('end');
 //                    var_dump($tank->getTankCenterY());
 //                    var_dump($tank->getTankCenterY()+$i);
 //                    var_dump($tank->getTankCenterX()+$i);
 //                    var_dump($this->getY());
-                    if ($tank->getTankCenterY()+$i == $this->getY() && in_array($tank->getTankCenterX()+$i, $this->getPath())) {
+//                    var_dump($this->getX());
+                    if ($tank->getTankCenterY()+$i === $this->getY() && $tank->getTankCenterX()+$i === $this->getX()) {
+//                        var_dump('found:'.'TCYi'.($tank->getTankCenterY()+$i).'TCXi'.($tank->getTankCenterX()+$i).
+//                                                              'BY'.($this->getY()).'BX'.($this->getX()));
                         /** bullet path bulletTime on current tank position */
                         $bulletTime = $this->getPathTime()[$tank->getTankCenterX() + $i]; // todo add isset // todo refactor in method!!
                         $bTimestamp = (float)$bulletTime->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+//                        var_dump($bTimestamp);
 //                        $tankCurPosTime = $tank->getTime();
                         $tankRoute =  $tank->getRoute();
-                        $index = ($tank->getTankCenterX()+$i) . ':' . ($tank->getTankCenterY()+$i);
+                        $index = ($tank->getTankCenterX()) . ':' . ($tank->getTankCenterY());
+//                        var_dump($index);
                         if ($tankRoute->checkMove($index)) {
+//                            var_dump('move found');
                             $tankCurrentMove = $tankRoute->getMove($index);
                             $tCMTimestamp = (float)$tankCurrentMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+//                            var_dump($tCMTimestamp);
                             $tankMoves = $tankRoute->getTankMoves();
                             while (current($tankMoves) !== $tankCurrentMove) next($tankMoves);
                             $nextTankMove = next($tankMoves); // if tank moved from the shoot time
@@ -257,7 +269,7 @@ class Bullet
             if (is_object($value)) {
                 continue;
             }
-            if($key === 'path') {
+            if($key === 'path' || $key === 'pathTime') {
                 continue; // todo refactor
             }
             
@@ -299,5 +311,24 @@ class Bullet
             $timeStrMicroseconds = $this->getShootTime()->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;
             $this->pathTime[$path] = new \DateTime($this->getShootTime()->format(DateTimeUser::DATE_TIME . '.' .$timeStrMicroseconds));
         }
+    }
+    
+    public function move()
+    {
+//        var_dump('BulletsMove');
+        $direction = $this->getDirection();
+        if($direction === Canvas::CODE_LEFT_ARROW) {
+            $this->x -= Bullet::BULLET_STEP;
+        }
+        if($direction === Canvas::CODE_UP_ARROW) {
+            $this->y -= Bullet::BULLET_STEP;
+        }
+        if($direction === Canvas::CODE_RIGHT_ARROW) {
+            $this->x += Bullet::BULLET_STEP;
+        }
+        if($direction === Canvas::CODE_DOWN_ARROW) {
+            $this->y += Bullet::BULLET_STEP;
+        }
+//        var_dump($this->x);
     }
 }
