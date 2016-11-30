@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Tanks;
 
 
-class BulletRegistry
+class BulletRegistry // todo refactor with iterator
 {
     /**
      *  @param array $storage
@@ -46,7 +46,7 @@ class BulletRegistry
     }
     
     /**
-     * @return array
+     * @return Bullet[]
      */
     public static function getStorage() : array
     {

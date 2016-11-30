@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace Tanks;
-use Validators\GuidValidator;
+use JsonSchema\Exception\JsonDecodingException;
 use WebSocket\WebSocket;
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -39,7 +39,7 @@ while (true) {
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
     }
     if (!empty($read)) {
-        $serverTime = \DateTime::createFromFormat('U.u', microtime(true)); // create time with microseconds
+        $serverTime = DateTimeUser::createDateTimeMicro();
         foreach($read as $currentConnect) {//обрабатываем все соединения
             $data = fread($currentConnect, 100000);
             if (!strlen($data)) { //соединение было закрыто
@@ -75,7 +75,7 @@ fclose($socket);
  */
 function onOpen($connect) {
     var_dump('connection opened');
-    $now = \DateTime::createFromFormat('U.u', microtime(true)); // create time with microseconds
+    $now = DateTimeUser::createDateTimeMicro();
     $tank = new Tank($now);
     TankRegistry::addTank($tank);
     $dataObject = (string)$tank;
@@ -106,43 +106,41 @@ function onMessage($connect, $data, \DateTime $serverTime) {
     }
 //    var_dump('$decMessage');
 //    var_dump($decMessage);
-    $dataObject = json_decode($decMessage['payload']);
-    if ($dataObject === null) {
-        var_dump('wrong data');
-        var_dump(json_last_error_msg());
+    try {
+        $message = new ClientMessageContainer($decMessage);
+    } catch (EmptyPayLoadException $e) {
+        var_dump($e);
+        return true;
+    } catch (JsonDecodingException $e) {
+        var_dump($e);
+        return true;
+    } catch (InvalidGuidException $e) {
+        var_dump($e);
         return true;
     }
-    if (empty($dataObject->id) || !GuidValidator::validate($dataObject->id)) {
-        var_dump('tank id not defined');
-        return true;
-    }
-    if (!TankRegistry::checkTank($dataObject->id)) {
-        var_dump('tank does not exist');
-        return true;
-    }
-    if (isset($dataObject->type) && $dataObject->type === 'bullet') {
-        if (!BulletRegistry::checkBullet($dataObject->id)) {
-            $bullet = new Bullet($dataObject);
+    
+    if ($message->getType() === ClientMessageContainer::TYPE_BULLET) {
+        if (!BulletRegistry::checkBullet($message->getId())) {
+            $bullet = new Bullet($message);
             BulletRegistry::addBullet($bullet);
-            $tankBullet = TankRegistry::getTank($dataObject->id);
+            $tankBullet = TankRegistry::getTank($message->getId());
             $tankBullet->setBullet($bullet);
         }
     }
-    $tank = TankRegistry::getTank($dataObject->id);
-    if (!empty($dataObject->newd)) {
-        $tank->setDirection($dataObject->newd); // todo refactor
-        $clientTime = \DateTime::createFromFormat('U.u', str_replace(',', '.', $dataObject->time/1000));
+    $tank = TankRegistry::getTank($message->getId());
+    if (!empty($message->getNewd())) {
+        $tank->setDirection($message->getNewd());
+        $clientTime = $message->getTime();
         $interval = $clientTime->diff($serverTime);
         $time = $serverTime;
         if ((int)$interval->format('%Y%m%d%H%m%s') === 0) { // if difference more than 1 second use server time
             $time = $clientTime;
         }
-        $tank->setTime($time);
-        $tank->moveTank(); // todo refactor
+        
+        $tank->moveTank($time); // todo refactor
     }
     $bullets = BulletRegistry::getStorage();
     if (count($bullets) !== 0) {
-        /** @var Bullet $bullet */
         foreach ($bullets as $bullet) {
             $bullet->checkIntersection();
             BulletRegistry::removeBullet($bullet->getId());
@@ -152,9 +150,9 @@ function onMessage($connect, $data, \DateTime $serverTime) {
     // after shooting and checking intesection. save tank state. and now we can unset bullets
     if (count($bullets) !== 0) {
         TankRegistry::unsetBullets();
-        BulletRegistry::unsetStorage();
+        BulletRegistry::unsetStorage();//todo refactor
     }
-    BulletRegistry::unsetStorage();
+    BulletRegistry::unsetStorage();//todo refactor
 //    $storage1 = TankRegistry::getStorageJSON();
 //    var_dump('$storage1');
 //    var_dump($storage1);

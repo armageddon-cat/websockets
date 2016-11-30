@@ -11,6 +11,7 @@ class Tank
     private $status;
     private $bullet;
     private $time; // 'U.u'
+    private $route;
     const TANK_STEP = 10;
     const TANK_SIZE = 100;
     const TANK_HIT_AREA = 20;
@@ -29,9 +30,11 @@ class Tank
         $this->setY(self::DEFAULT_TANK_CORS_X);
         $this->setDirection(self::DEFAULT_TANK_DIRECTION);
         $this->setTime($time);
+        $this->setRoute($this);
     }
     
-    public function moveTank() {
+    public function moveTank($moveTime) {
+        $this->setTime($moveTime);
         $direction = $this->getDirection();
         if($direction === Canvas::CODE_LEFT_ARROW) {
             $this->x -= self::TANK_STEP;
@@ -45,6 +48,7 @@ class Tank
         if($direction === Canvas::CODE_DOWN_ARROW) {
             $this->y += self::TANK_STEP;
         }
+        $this->getRoute()->addMove($this);
     }
     
     /**
@@ -136,7 +140,13 @@ class Tank
         foreach ($this as $key => $value) {
             $result[$key] = $value;
             if (is_object($value)) {
-                $result[$key] = (string)$value;
+                if ($value instanceof \DateTime) {
+                    $result[$key] = $value->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS_SHORT);
+                } else {
+                    if (!($value instanceof TankMoveRoute)) {
+                        $result[$key] = (string)$value;
+                    }
+                }
             }
         }
         return json_encode($result);
@@ -226,18 +236,37 @@ class Tank
     }
     
     /**
-     * @return string
+     * Current position time
+     * @return \DateTime
      */
-    public function getTime() : string
+    public function getTime() : \DateTime
     {
-        return (string)$this->time;
+        return $this->time;
     }
     
     /**
+     * Current position time
      * @param \DateTime $time
      */
     public function setTime(\DateTime $time)
     {
-        $this->time = (string)$time; // todo store in correct format
+        $this->time = $time;
+    }
+    
+    /**
+     * @internal param TankMoveRoute $route
+     *
+     */
+    public function setRoute(Tank $tank)
+    {
+        $this->route = new TankMoveRoute($tank);
+    }
+
+    /**
+     * @return TankMoveRoute
+     */
+    public function getRoute() : TankMoveRoute
+    {
+        return $this->route;
     }
 }

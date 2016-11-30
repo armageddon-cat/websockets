@@ -14,20 +14,27 @@ class Bullet
     private $y;
     private $shootTime; // 'U.u' make object in future
     const BULLET_STEP = 10; // pixel
+    const BULLET_DELAY_REAL = 20;// milliseconds (thousandths of a second)
+    const BULLET_DELAY_REAL_MICROSECONDS = self::BULLET_DELAY * 1000;// microseconds
     const BULLET_DELAY = 500; // milliseconds (thousandths of a second)
     const BULLET_DELAY_MICROSECONDS = self::BULLET_DELAY * 1000; // microseconds
     const BULLET_DELAY_SECONDS = self::BULLET_DELAY / 1000; // seconds
     const BULLET_SIZE = 10;
+    const BULLET_FLY_TIME = self::BULLET_DELAY_REAL * (Canvas::CANVAS_SIZE / Bullet::BULLET_STEP); // 20 * ( 800 / 10 ) = 1600 milsec = 1.6sec
+    const BULLET_FLY_TIME_MICROSECONDS = self::BULLET_FLY_TIME * 1000; // microseconds
+    const BULLET_FLY_TIME_SECONDS = self::BULLET_FLY_TIME / 1000; // seconds
+
     
-    public function __construct(\stdClass $object)
+    public function __construct(ClientMessageContainer $object)
     {
-        $this->setId($object->id);
+        $this->setId($object->getId());
         $this->setTank(TankRegistry::getTank($this->getId()));
         $this->setDirection($this->getTank()->getDirection());
         $this->setPath();
         $this->setX($this->getTank()->getTankBarrelX());
         $this->setY($this->getTank()->getTankBarrelY());
-        $this->setShootTime($object->time);
+        $this->setShootTime($object->getTime());
+        $this->setPathTime();
     }
     
     /**
@@ -110,20 +117,62 @@ class Bullet
 //                    var_dump($tank->getTankCenterX()+$i);
 //                    var_dump($this->getY());
                     if ($tank->getTankCenterY()+$i == $this->getY() && in_array($tank->getTankCenterX()+$i, $this->getPath())) {
-                        $time = $this->getPathTime()[$tank->getTankCenterX()+$i];
-                        if ($tank->getTime() == $time || $tank->getTime() == $time+500 || $tank->getTime() == $time-500) { // make interval for time
+                        /** bullet path bulletTime on current tank position */
+                        $bulletTime = $this->getPathTime()[$tank->getTankCenterX() + $i]; // todo add isset // todo refactor in method!!
+                        $bTimestamp = (float)$bulletTime->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+//                        $tankCurPosTime = $tank->getTime();
+                        $tankRoute =  $tank->getRoute();
+                        $index = ($tank->getTankCenterX()+$i) . ':' . ($tank->getTankCenterY()+$i);
+                        if ($tankRoute->checkMove($index)) {
+                            $tankCurrentMove = $tankRoute->getMove($index);
+                            $tCMTimestamp = (float)$tankCurrentMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+                            $tankMoves = $tankRoute->getTankMoves();
+                            while (current($tankMoves) !== $tankCurrentMove) next($tankMoves);
+                            $nextTankMove = next($tankMoves); // if tank moved from the shoot time
+                            if ($nextTankMove) {
+                                $tNMTimestamp = (float)$nextTankMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+                                if ($bTimestamp > $tCMTimestamp && $bTimestamp < $tNMTimestamp ) {
+                                    var_dump('tankstatusupdated1');
+                                    $tank->setStatus(Tank::DEAD);
+                                }
+                            }
+                            if ($bTimestamp > $tCMTimestamp) {
+                                var_dump('tankstatusupdated2');
+                                $tank->setStatus(Tank::DEAD);
+                            }
+                            break;
                         }
-                        $tank->getTime() === $this->getShootTime(); // todo end this part
-//                        var_dump('tankstatusupdated');
-                        $tank->setStatus(Tank::DEAD);
-                        break;
+//                        $t1 = new \DateTime($bulletTime->format(\DateTime::W3C));
+//                        $t2 = new \DateTime($bulletTime->format(\DateTime::W3C));
+//                        $timeForwardOffset = $t1->add(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
+//                        $timeBackwardOffset = $t2->sub(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
+//                        $diff1 = $tankCurPosTime->diff($timeForwardOffset);
+//                        $diff2 = $tankCurPosTime->diff($timeBackwardOffset);
+//                        var_dump($bulletTime);
+//                        var_dump($tankCurPosTime);
+////                        var_dump($timeForwardOffset);
+//                        var_dump($timeBackwardOffset);
+                        
                     }
                 }
             }
             if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
                 for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
                     if ($tank->getTankCenterX()+$i == $this->getX() && in_array($tank->getTankCenterY()+$i, $this->getPath())) {
-                        $tank->setStatus(Tank::DEAD);
+                        /** bullet path bulletTime on current tank position */
+                        $bulletTime           = $this->getPathTime()[$tank->getTankCenterY() + $i];
+                        $tankCurPosTime = $tank->getTime();
+                        $timeForwardOffset = $bulletTime->add(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
+                        $timeBackwardOffset = $bulletTime->sub(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
+                        var_dump($bulletTime);
+                        var_dump($tankCurPosTime);
+                        var_dump($timeForwardOffset);
+                        var_dump($timeBackwardOffset);
+                        if ($tankCurPosTime == $bulletTime || $tankCurPosTime == $timeForwardOffset || $tankCurPosTime == $timeBackwardOffset) { // make interval for bulletTime
+//                        $tankCurPosTime === $this->getShootTime(); // todo end this part // i dont think this is needed
+                        var_dump('tankstatusupdated');
+                            $tank->setStatus(Tank::DEAD);
+                        }
                         break;
                     }
                 }
@@ -218,19 +267,19 @@ class Bullet
     }
     
     /**
-     * @return string
+     * @return \DateTime
      */
-    public function getShootTime() : string
+    public function getShootTime() : \DateTime
     {
-        return (string)$this->shootTime;
+        return $this->shootTime;
     }
     
     /**
-     * @param string $shootTime
+     * @param \DateTime $shootTime
      */
-    public function setShootTime(string $shootTime)
+    public function setShootTime(\DateTime $shootTime)
     {
-        $this->shootTime = (string)$shootTime;
+        $this->shootTime = $shootTime;
     }
     
     /**
@@ -247,7 +296,8 @@ class Bullet
     public function setPathTime()
     {
         foreach ($this->getPath() as $path) {
-            $this->pathTime[$path] = (float)$this->getShootTime() + self::BULLET_DELAY_SECONDS;
+            $timeStrMicroseconds = $this->getShootTime()->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;
+            $this->pathTime[$path] = new \DateTime($this->getShootTime()->format(DateTimeUser::DATE_TIME . '.' .$timeStrMicroseconds));
         }
     }
 }
