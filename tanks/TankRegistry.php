@@ -45,7 +45,7 @@ class TankRegistry
     }
     
     /**
-     * @return array
+     * @return Tank[]
      */
     public static function getStorage() : array
     {

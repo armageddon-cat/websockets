@@ -25,7 +25,7 @@ while (true) {
     
     if (in_array($socket, $read)) {//есть новое соединение
         //принимаем новое соединение и производим рукопожатие:
-        if (($connect = stream_socket_accept($socket, -1))) {
+        if ($connect = stream_socket_accept($socket, -1)) {
             /** @var resource $connect */
             $ws = new WebSocket($connect);
             $info = $ws->handshake();
@@ -46,7 +46,7 @@ while (true) {
             if (!strlen($data)) { //соединение было закрыто
                 fclose($currentConnect);
                 unset($connects[array_search($currentConnect, $connects)]);
-                onClose($currentConnect);//вызываем пользовательский сценарий
+                onClose(/*$currentConnect*/);//вызываем пользовательский сценарий
                 continue;
             }
         

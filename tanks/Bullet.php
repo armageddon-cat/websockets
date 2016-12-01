@@ -101,96 +101,73 @@ class Bullet
     
     public function checkIntersection()
     {
-//        var_dump('checkIntersectionstart');
-//        var_dump(json_encode($this->getPath()));
         $direction = $this->getDirection();
         $tanks = TankRegistry::getStorage();
-        /** @var Tank $tank */
         foreach ($tanks as $tank) {
-            if ($this->getId() == $tank->getId()) {
+            if ($this->getId() === $tank->getId()) {
                 continue;
             }
             if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
                 for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
-//                    var_dump('start');
-//                    var_dump('TCY'.$tank->getTankCenterY().'TCX'.$tank->getTankCenterX().
-//                             'TCYi'.($tank->getTankCenterY()+$i).'TCXi'.($tank->getTankCenterX()+$i).
-//                             'BY'.($this->getY()).'BX'.($this->getX()));
-//                    var_dump('end');
-//                    var_dump($tank->getTankCenterY());
-//                    var_dump($tank->getTankCenterY()+$i);
-//                    var_dump($tank->getTankCenterX()+$i);
-//                    var_dump($this->getY());
-//                    var_dump($this->getX());
                     if ($tank->getTankCenterY()+$i === $this->getY() && $tank->getTankCenterX()+$i === $this->getX()) {
-//                        var_dump('found:'.'TCYi'.($tank->getTankCenterY()+$i).'TCXi'.($tank->getTankCenterX()+$i).
-//                                                              'BY'.($this->getY()).'BX'.($this->getX()));
                         /** bullet path bulletTime on current tank position */
                         $bulletTime = $this->getPathTime()[$tank->getTankCenterX() + $i]; // todo add isset // todo refactor in method!!
                         $bTimestamp = (float)$bulletTime->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
-//                        var_dump($bTimestamp);
-//                        $tankCurPosTime = $tank->getTime();
-                        $tankRoute =  $tank->getRoute();
-                        $index = ($tank->getTankCenterX()) . ':' . ($tank->getTankCenterY());
-//                        var_dump($index);
+                        $tankRoute  = $tank->getRoute();
+                        $index      = $tank->getTankCenterX() . ':' . $tank->getTankCenterY();
                         if ($tankRoute->checkMove($index)) {
-//                            var_dump('move found');
                             $tankCurrentMove = $tankRoute->getMove($index);
-                            $tCMTimestamp = (float)$tankCurrentMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
-//                            var_dump($tCMTimestamp);
-                            $tankMoves = $tankRoute->getTankMoves();
-                            while (current($tankMoves) !== $tankCurrentMove) next($tankMoves);
+                            $tCMTimestamp    = (float)$tankCurrentMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+                            $tankMoves       = $tankRoute->getTankMoves();
+                            while (current($tankMoves) !== $tankCurrentMove) {
+                                next($tankMoves);
+                            }
                             $nextTankMove = next($tankMoves); // if tank moved from the shoot time
                             if ($nextTankMove) {
                                 $tNMTimestamp = (float)$nextTankMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
-                                if ($bTimestamp > $tCMTimestamp && $bTimestamp < $tNMTimestamp ) {
-                                    var_dump('tankstatusupdated1');
+                                if ($bTimestamp > $tCMTimestamp && $bTimestamp < $tNMTimestamp) {
                                     $tank->setStatus(Tank::DEAD);
                                 }
                             }
                             if ($bTimestamp > $tCMTimestamp) {
-                                var_dump('tankstatusupdated2');
                                 $tank->setStatus(Tank::DEAD);
                             }
                             break;
                         }
-//                        $t1 = new \DateTime($bulletTime->format(\DateTime::W3C));
-//                        $t2 = new \DateTime($bulletTime->format(\DateTime::W3C));
-//                        $timeForwardOffset = $t1->add(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
-//                        $timeBackwardOffset = $t2->sub(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
-//                        $diff1 = $tankCurPosTime->diff($timeForwardOffset);
-//                        $diff2 = $tankCurPosTime->diff($timeBackwardOffset);
-//                        var_dump($bulletTime);
-//                        var_dump($tankCurPosTime);
-////                        var_dump($timeForwardOffset);
-//                        var_dump($timeBackwardOffset);
-                        
                     }
                 }
             }
             if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
                 for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
-                    if ($tank->getTankCenterX()+$i == $this->getX() && in_array($tank->getTankCenterY()+$i, $this->getPath())) {
+                    if ($tank->getTankCenterX()+$i === $this->getX() && $tank->getTankCenterY()+$i === $this->getY()) {
                         /** bullet path bulletTime on current tank position */
-                        $bulletTime           = $this->getPathTime()[$tank->getTankCenterY() + $i];
-                        $tankCurPosTime = $tank->getTime();
-                        $timeForwardOffset = $bulletTime->add(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
-                        $timeBackwardOffset = $bulletTime->sub(new \DateInterval('PT' . 1 . 'S')); // todo 500 milisec instead of 1sec
-                        var_dump($bulletTime);
-                        var_dump($tankCurPosTime);
-                        var_dump($timeForwardOffset);
-                        var_dump($timeBackwardOffset);
-                        if ($tankCurPosTime == $bulletTime || $tankCurPosTime == $timeForwardOffset || $tankCurPosTime == $timeBackwardOffset) { // make interval for bulletTime
-//                        $tankCurPosTime === $this->getShootTime(); // todo end this part // i dont think this is needed
-                        var_dump('tankstatusupdated');
-                            $tank->setStatus(Tank::DEAD);
+                        $bulletTime = $this->getPathTime()[$tank->getTankCenterY() + $i];
+                        $bTimestamp = (float)$bulletTime->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+                        $tankRoute  = $tank->getRoute();
+                        $index      = $tank->getTankCenterX() . ':' . $tank->getTankCenterY();
+                        if ($tankRoute->checkMove($index)) {
+                            $tankCurrentMove = $tankRoute->getMove($index);
+                            $tCMTimestamp    = (float)$tankCurrentMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+                            $tankMoves       = $tankRoute->getTankMoves();
+                            while (current($tankMoves) !== $tankCurrentMove) {
+                                next($tankMoves);
+                            }
+                            $nextTankMove = next($tankMoves); // if tank moved from the shoot time
+                            if ($nextTankMove) {
+                                $tNMTimestamp = (float)$nextTankMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
+                                if ($bTimestamp > $tCMTimestamp && $bTimestamp < $tNMTimestamp) {
+                                    $tank->setStatus(Tank::DEAD);
+                                }
+                            }
+                            if ($bTimestamp > $tCMTimestamp) {
+                                $tank->setStatus(Tank::DEAD);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
         }
-//        var_dump('checkIntersectionend');
     }
     
     

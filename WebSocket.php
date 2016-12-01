@@ -75,7 +75,7 @@ class WebSocket
         $firstByteBinary = sprintf('%08b', ord($data[0]));
         $secondByteBinary = sprintf('%08b', ord($data[1]));
         $opcode = bindec(substr($firstByteBinary, 4, 4));
-        $isMasked = ($secondByteBinary[0] == '1') ? true : false;
+        $isMasked = $secondByteBinary[0] == '1';
         $payloadLength = ord($data[1]) & 127;
         
         // unmasked frame is received:
@@ -149,7 +149,7 @@ class WebSocket
             }
             $decodedData['payload'] = $unmaskedPayload;
         } else {
-            $payloadOffset = $payloadOffset - 4;
+            $payloadOffset -= 4;
             $decodedData['payload'] = substr($data, $payloadOffset);
         }
         
