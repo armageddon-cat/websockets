@@ -3,79 +3,53 @@ declare(strict_types=1);
 namespace Tanks;
 
 
-class BulletRegistry // todo refactor with iterator
+use ClassesAbstract\AbstractRegistry;
+
+/**
+ * Class BulletRegistry
+ * @package Tanks
+ */
+class BulletRegistry extends AbstractRegistry
 {
+    protected static $instance = null;
     /**
-     *  @param array $storage
+     * Move each bullet with one step forward
+     * and unset it from registry and tank
+     * if it is out of border
      */
-    private static $storage = [];
-    
-    /**
-     * @param Bullet $bullet
-     */
-    public static function addBullet(Bullet $bullet) {
-        self::$storage[$bullet->getId()] = $bullet;
-    }
-    
-    /**
-     * @param $id
-     *
-     * @return Bullet
-     */
-    public static function getBullet(string $id) : Bullet
-    {
-        return self::$storage[$id];
-    }
-    
-    /**
-     * @param $id
-     *
-     * @return bool
-     */
-    public static function checkBullet(string $id) : bool
-    {
-        return isset(self::$storage[$id]);
-    }
-    
-    /**
-     * @param $id
-     */
-    public static function removeBullet(string $id)
-    {
-        unset(self::$storage[$id]);
-    }
-    
-    /**
-     * @return Bullet[]
-     */
-    public static function getStorage() : array
-    {
-        return self::$storage;
-    }
-    
-    /**
-     *
-     */
-    public static function unsetStorage()
-    {
-        self::$storage = [];
-    }
-    
     public static function moveBullets()
     {
-//        var_dump(__FUNCTION__);
-        $bullets = self::getStorage();
-//        var_dump($bullets);
-        foreach ($bullets as $bullet) {
-//            var_dump(__FUNCTION__ . 'foreach');
+        $bulletsStorage = self::getInstance();
+        $bulletsStorage->rewind();
+        while ($bulletsStorage->valid()) {
+            $bullet = $bulletsStorage->current();
             $bullet->move();
-            $bulX = $bullet->getX();
-            $bulY = $bullet->getY();
-            if ($bulX < Canvas::CANVAS_START || $bulX > Canvas::CANVAS_SIZE ||
-                $bulY < Canvas::CANVAS_START || $bulY > Canvas::CANVAS_SIZE) {
-                self::removeBullet($bullet->getId());
+            if (!$bullet->inBounds($bullet)) {
+                self::remove($bullet);
+                $bullet->getTank()->unsetBullet();
             }
+            $bulletsStorage->next();
         }
     }
+    
+    /**
+     * @return self
+     */
+    public static function getInstance() : self
+    {
+        if (self::$instance === null) {
+            self::setInstance(new self);
+        }
         
+        return self::$instance;
+    }
+    
+    /**
+     * @return Bullet
+     */
+    public function current(): Bullet
+    {
+        return parent::current();
+    }
+    
 }

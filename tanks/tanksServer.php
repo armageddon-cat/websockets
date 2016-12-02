@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace Tanks;
-use JsonSchema\Exception\JsonDecodingException;
+use Exceptions\EmptyPayLoadException;
+use Exceptions\InvalidGuidException;
+use Exceptions\JsonDecodingException;
 use WebSocket\WebSocket;
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -56,10 +58,12 @@ while (true) {
     } else {
 //        $k=0;
 //        var_dump('else');
-        $bullets = BulletRegistry::getStorage();
-        foreach ($bullets as $bullet) {
-            $bullet->checkIntersection(); // todo check with currect bullet iteration position
-//            BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
+        $bulletsStorage = BulletRegistry::getInstance();
+        $bulletsStorage->rewind();
+        while ($bulletsStorage->valid()) {
+            $bulletsStorage->current()->checkIntersection();
+            $bulletsStorage->next();
+//          BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
         }
         BulletRegistry::moveBullets();
         foreach($connects as $Cconnect) {//обрабатываем все соединения
@@ -85,7 +89,7 @@ function onOpen($connect) {
     var_dump('connection opened');
     $now = DateTimeUser::createDateTimeMicro();
     $tank = new Tank($now);
-    TankRegistry::addTank($tank);
+    TankRegistry::add($tank);
     $dataObject = (string)$tank;
     fwrite($connect,  WebSocket::encode($dataObject));
 }
@@ -128,14 +132,15 @@ function onMessage($connect, $data, \DateTime $serverTime) {
     }
     
     if ($message->getType() === ClientMessageContainer::TYPE_BULLET) {
-        if (!BulletRegistry::checkBullet($message->getId())) {
+        if (!BulletRegistry::exists($message->getId())) {
             $bullet = new Bullet($message);
-            BulletRegistry::addBullet($bullet);
-            $tankBullet = TankRegistry::getTank($message->getId());
+//            BulletRegistry::addBullet($bullet);
+            BulletRegistry::add($bullet);
+            $tankBullet = TankRegistry::get($message->getId());
             $tankBullet->setBullet($bullet);
         }
     }
-    $tank = TankRegistry::getTank($message->getId());
+    $tank = TankRegistry::get($message->getId());
     if (!empty($message->getNewd())) {
         $tank->setDirection($message->getNewd());
         $clientTime = $message->getTime();
@@ -147,19 +152,21 @@ function onMessage($connect, $data, \DateTime $serverTime) {
         
         $tank->moveTank($time); // todo refactor
     }
-    $bullets = BulletRegistry::getStorage();
-    foreach ($bullets as $bullet) {
-        $bullet->checkIntersection(); // todo check with currect bullet iteration position
-//            BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
+    $bulletsStorage = BulletRegistry::getInstance();
+    $bulletsStorage->rewind();
+    while ($bulletsStorage->valid()) {
+        $bulletsStorage->current()->checkIntersection();
+        $bulletsStorage->next();
+//      BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
     }
     BulletRegistry::moveBullets();
     $storage = TankRegistry::getStorageJSON();
     // after shooting and checking intesection. save tank state. and now we can unset bullets
-    if (count($bullets) !== 0) {
+//    if (count($bullets) !== 0) {
 //        TankRegistry::unsetBullets(); // todo too early unsetting bullets
-//        BulletRegistry::unsetStorage();//todo refactor
-    }
-//    BulletRegistry::unsetStorage();//todo refactor
+//        BulletRegistry::unsetRegistry();//todo refactor
+//    }
+//    BulletRegistry::unsetRegistry();//todo refactor
 //    $storage1 = TankRegistry::getStorageJSON();
 //    var_dump('$storage1');
 //    var_dump($storage1);

@@ -2,72 +2,56 @@
 declare(strict_types=1);
 namespace Tanks;
 
-class TankRegistry
+use ClassesAbstract\AbstractRegistry;
+
+/**
+ * Class TankRegistry
+ * @package Tanks
+ */
+class TankRegistry extends AbstractRegistry
 {
-    /**
-    *  @param array $storage
-    */
-    private static $storage = [];
-    
-    /**
-     * @param Tank $tank
-     */
-    public static function addTank(Tank $tank) {
-        self::$storage[$tank->getId()] = $tank;
-    }
-    
-    /**
-     * @param $id
-     *
-     * @return Tank
-     */
-    public static function getTank(string $id) : Tank
-    {
-        return self::$storage[$id];
-    }
-    
-    /**
-     * @param $id
-     *
-     * @return bool
-     */
-    public static function checkTank(string $id) : bool
-    {
-        return isset(self::$storage[$id]);
-    }
-    
-    /**
-     * @param $id
-     */
-    public function removeTank(string $id)
-    {
-        unset(self::$storage[$id]);
-    }
-    
-    /**
-     * @return Tank[]
-     */
-    public static function getStorage() : array
-    {
-        return self::$storage;
-    }
-    
+    protected static $instance = null;
     /**
      * @return string
      */
     public static function getStorageJSON() : string
     {
         $result = [];
-        foreach (self::$storage as $item) {
-            $result[] = (string)$item;
+        self::getInstance()->rewind();
+        while (self::getInstance()->valid()) {
+            $result[] = (string)self::getInstance()->current();
+            self::getInstance()->next();
         }
         return json_encode($result);
     }
     
-    public static function unsetBullets()
+    /**
+     * @return self
+     */
+    public static function getInstance() : self
     {
-        foreach (self::$storage as $item) {
-            $item->unsetBullet();
+        if (self::$instance === null) {
+            self::setInstance(new self);
         }
+        
+        return self::$instance;
+    }
+    
+    /**
+     * @return Tank
+     */
+    public function current(): Tank
+    {
+        return parent::current();
+    }
+    
+    /**
+     * @param string $id
+     *
+     * @return Tank
+     */
+    public static function get(string $id) : Tank
+    {
+        return self::getInstance()->offsetGet($id);
     }
 }

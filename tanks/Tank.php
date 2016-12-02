@@ -2,26 +2,19 @@
 declare(strict_types=1);
 namespace Tanks;
 
-class Tank
+use ClassesAbstract\TankAbstract;
+
+/**
+ * Class Tank
+ * @package Tanks
+ */
+class Tank extends TankAbstract
 {
-    private $id;
-    private $x;
-    private $y;
-    private $direction;
-    private $status;
-    private $bullet;
-    private $time; // 'U.u'
-    private $route;
-    const TANK_STEP = 10;
-    const TANK_SIZE = 100;
-    const TANK_HIT_AREA = 20;
-    const DEAD = 0;
-    const ALIVE = 1;
-    const TANK_BARREL_OFFSET_VALUE = 60;
-    const DEFAULT_TANK_CORS_X = 150;
-    const DEFAULT_TANK_CORS_Y = 150;
-    const DEFAULT_TANK_DIRECTION = Canvas::CODE_UP_ARROW;
-    
+    /**
+     * Tank constructor.
+     *
+     * @param \DateTime $time
+     */
     public function __construct(\DateTime $time)
     {
         $this->setId(Guid::newRef());
@@ -33,7 +26,10 @@ class Tank
         $this->setRoute($this);
     }
     
-    public function moveTank($moveTime) {
+    /**
+     * @param \DateTime $moveTime
+     */
+    public function moveTank(\DateTime $moveTime) {
         $this->setTime($moveTime);
         $direction = $this->getDirection();
         if($direction === Canvas::CODE_LEFT_ARROW) {
@@ -49,86 +45,6 @@ class Tank
             $this->y += self::TANK_STEP;
         }
         $this->getRoute()->addMove($this);
-    }
-    
-    /**
-     * @return string
-     */
-    public function getId() : string
-    {
-        return (string)$this->id;
-    }
-    
-    /**
-     * @param mixed $id
-     */
-    protected function setId(string $id)
-    {
-        $this->id = (string)$id;
-    }
-    
-    /**
-     * @return int
-     */
-    public function getX() : int
-    {
-        return (int)$this->x;
-    }
-    
-    /**
-     * @param int $x
-     */
-    public function setX(int $x)
-    {
-        $this->x = (int)$x;
-    }
-    
-    /**
-     * @return int
-     */
-    public function getY() : int
-    {
-        return (int)$this->y;
-    }
-    
-    /**
-     * @param int $y
-     */
-    public function setY(int $y)
-    {
-        $this->y = (int)$y;
-    }
-    
-    /**
-     * @return int
-     */
-    public function getDirection() : int
-    {
-        return (int)$this->direction;
-    }
-    
-    /**
-     * @param int $direction
-     */
-    public function setDirection(int $direction)
-    {
-        $this->direction = (int)$direction;
-    }
-    
-    /**
-     * @return int
-     */
-    public function getStatus() : int
-    {
-        return (int)$this->status;
-    }
-    
-    /**
-     * @param int $status
-     */
-    public function setStatus(int $status)
-    {
-        $this->status = (int)$status;
     }
     
     /**
@@ -153,22 +69,6 @@ class Tank
         return json_encode($result);
     }
     
-    /**
-     * @return Bullet
-     */
-    public function getBullet() : Bullet
-    {
-        return $this->bullet;
-    }
-    
-    /**
-     * @param Bullet $bullet
-     */
-    public function setBullet(Bullet $bullet)
-    {
-        $this->bullet = $bullet;
-    }
-    
     public function unsetBullet()
     {
         unset($this->bullet);
@@ -179,8 +79,7 @@ class Tank
      */
     public function getTankCenterX() : int
     {
-        $tankCenterX = $this->getX() + Tank::TANK_SIZE * 0.5;
-        return (int)$tankCenterX;
+        return (int)($this->getX() + Tank::TANK_SIZE * 0.5);
     }
     
     /**
@@ -188,8 +87,7 @@ class Tank
      */
     public function getTankCenterY() : int
     {
-        $tankCenterY = $this->getY() + Tank::TANK_SIZE * 0.5;
-        return (int)$tankCenterY;
+        return (int)($this->getY() + Tank::TANK_SIZE * 0.5);
     }
     
     /**
@@ -215,7 +113,7 @@ class Tank
             $offsetValue = self::TANK_BARREL_OFFSET_VALUE;
         }
         
-        return (int)$offsetValue;
+        return $offsetValue;
     }
     
     /**
@@ -223,8 +121,7 @@ class Tank
      */
     public function getTankBarrelX() : int
     {
-        $tankBarrel = $this->getTankCenterX() + $this->calculateOffset(Canvas::AXIS_X);
-        return (int)$tankBarrel;
+        return (int)($this->getTankCenterX() + $this->calculateOffset(Canvas::AXIS_X));
     }
     
     /**
@@ -232,43 +129,6 @@ class Tank
      */
     public function getTankBarrelY() : int
     {
-        $tankBarrel = $this->getTankCenterY() + $this->calculateOffset(Canvas::AXIS_Y);
-        return (int)$tankBarrel;
-    }
-    
-    /**
-     * Current position time
-     * @return \DateTime
-     */
-    public function getTime() : \DateTime
-    {
-        return $this->time;
-    }
-    
-    /**
-     * Current position time
-     * @param \DateTime $time
-     */
-    public function setTime(\DateTime $time)
-    {
-        $this->time = $time;
-    }
-    
-    /**
-     * @internal param TankMoveRoute $route
-     *
-     * @param Tank $tank
-     */
-    public function setRoute(Tank $tank)
-    {
-        $this->route = new TankMoveRoute($tank);
-    }
-
-    /**
-     * @return TankMoveRoute
-     */
-    public function getRoute() : TankMoveRoute
-    {
-        return $this->route;
+        return (int)($this->getTankCenterY() + $this->calculateOffset(Canvas::AXIS_Y));
     }
 }

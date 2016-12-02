@@ -4,6 +4,10 @@ declare(strict_types=1);
 namespace Tanks;
 
 
+/**
+ * Class TankMoveRoute
+ * @package Tanks
+ */
 class TankMoveRoute
 {
     /**
@@ -11,6 +15,11 @@ class TankMoveRoute
      */
     private $storage = [];
     
+    /**
+     * TankMoveRoute constructor.
+     *
+     * @param \Tanks\Tank $tank
+     */
     public function __construct(Tank $tank)
     {
         $this->storage[$tank->getTankCenterX().':'.$tank->getTankCenterY()] = new TankMove($tank);

@@ -4,12 +4,21 @@ declare(strict_types=1);
 namespace Tanks;
 
 
+/**
+ * Class TankMove
+ * @package Tanks
+ */
 class TankMove
 {
     private $time;
     private $x;
     private $y;
     
+    /**
+     * TankMove constructor.
+     *
+     * @param Tank $tank
+     */
     public function __construct(Tank $tank)
     {
         $this->setTime($tank->getTime());

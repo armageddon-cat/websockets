@@ -1,8 +1,12 @@
 <?php
 declare(strict_types=1);
-namespace Tanks;
+namespace Exceptions;
 
 
+/**
+ * Class TankNotExistsException
+ * @package Exceptions
+ */
 class TankNotExistsException extends \LogicException
 {
     /**

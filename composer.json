@@ -3,7 +3,9 @@
     "psr-4": {
       "Tanks\\": "tanks/",
       "WebSocket\\": "",
-      "Validators\\": "tanks/Validators/"
+      "Validators\\": "tanks/Validators/",
+      "Exceptions\\": "tanks/Exceptions/",
+      "ClassesAbstract\\": "tanks/ClassesAbstract/"
     }
   },
   "require-dev": {

@@ -3,9 +3,16 @@ declare(strict_types=1);
 namespace Tanks;
 
 
-use JsonSchema\Exception\JsonDecodingException;
+use Exceptions\EmptyValueException;
+use Exceptions\InvalidGuidException;
+use Exceptions\TankNotExistsException;
+use Exceptions\JsonDecodingException;
 use Validators\GuidValidator;
 
+/**
+ * Class ClientMessageContainer
+ * @package Tanks
+ */
 class ClientMessageContainer
 {
     private $id;
@@ -15,6 +22,11 @@ class ClientMessageContainer
     private $payLoad;
     const TYPE_BULLET = 'bullet';
     
+    /**
+     * ClientMessageContainer constructor.
+     *
+     * @param array $decodedMessage
+     */
     public function __construct(array $decodedMessage)
     {
         $this->setPayLoad($decodedMessage);
@@ -36,9 +48,9 @@ class ClientMessageContainer
     /**
      * @param \stdClass $payLoadObject
      *
-     * @throws \Tanks\EmptyValueException
-     * @throws \Tanks\InvalidGuidException
-     * @throws \Tanks\TankNotExistsException
+     * @throws \Exceptions\EmptyValueException
+     * @throws \Exceptions\InvalidGuidException
+     * @throws \Exceptions\TankNotExistsException
      */
     protected function setId(\stdClass $payLoadObject)
     {
@@ -48,7 +60,7 @@ class ClientMessageContainer
         if (!GuidValidator::validate($payLoadObject->id)) {
             throw new InvalidGuidException();
         }
-        if (!TankRegistry::checkTank($payLoadObject->id)) {
+        if (!TankRegistry::exists($payLoadObject->id)) {
             throw new TankNotExistsException();
         }
         $this->id = (string)$payLoadObject->id;
@@ -109,7 +121,6 @@ class ClientMessageContainer
         $this->time = null;
         if (isset($payLoadObject->time)) {
             $this->time = \DateTime::createFromFormat(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS, str_replace(',', '.', $payLoadObject->time/1000));
-//            var_dump($this->time);
         }
     }
     
