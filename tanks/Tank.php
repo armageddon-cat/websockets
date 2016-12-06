@@ -14,6 +14,8 @@ class Tank extends TankAbstract
      * Tank constructor.
      *
      * @param \DateTime $time
+     *
+     * @throws \UnexpectedValueException
      */
     public function __construct(\DateTime $time)
     {
@@ -29,19 +31,20 @@ class Tank extends TankAbstract
     /**
      * @param \DateTime $moveTime
      */
-    public function moveTank(\DateTime $moveTime) {
+    public function moveTank(\DateTime $moveTime): void
+    {
         $this->setTime($moveTime);
         $direction = $this->getDirection();
-        if($direction === Canvas::CODE_LEFT_ARROW) {
+        if ($direction === Canvas::CODE_LEFT_ARROW) {
             $this->x -= self::TANK_STEP;
         }
-        if($direction === Canvas::CODE_UP_ARROW) {
+        if ($direction === Canvas::CODE_UP_ARROW) {
             $this->y -= self::TANK_STEP;
         }
-        if($direction === Canvas::CODE_RIGHT_ARROW) {
+        if ($direction === Canvas::CODE_RIGHT_ARROW) {
             $this->x += self::TANK_STEP;
         }
-        if($direction === Canvas::CODE_DOWN_ARROW) {
+        if ($direction === Canvas::CODE_DOWN_ARROW) {
             $this->y += self::TANK_STEP;
         }
         $this->getRoute()->addMove($this);
@@ -50,7 +53,7 @@ class Tank extends TankAbstract
     /**
      * @return string
      */
-    public function __toString() : string
+    public function __toString(): string
     {
         $result = [];
         foreach ($this as $key => $value) {
@@ -69,7 +72,7 @@ class Tank extends TankAbstract
         return json_encode($result);
     }
     
-    public function unsetBullet()
+    public function unsetBullet(): void
     {
         unset($this->bullet);
     }
@@ -77,7 +80,7 @@ class Tank extends TankAbstract
     /**
      * @return int
      */
-    public function getTankCenterX() : int
+    public function getTankCenterX(): int
     {
         return (int)($this->getX() + Tank::TANK_SIZE * 0.5);
     }
@@ -85,7 +88,7 @@ class Tank extends TankAbstract
     /**
      * @return int
      */
-    public function getTankCenterY() : int
+    public function getTankCenterY(): int
     {
         return (int)($this->getY() + Tank::TANK_SIZE * 0.5);
     }
@@ -95,7 +98,7 @@ class Tank extends TankAbstract
      *
      * @return int
      */
-    private function calculateOffset(string $type) : int
+    private function calculateOffset(string $type): int
     {
         $direction   = $this->getDirection();
         $offsetValue = 0;
@@ -119,7 +122,7 @@ class Tank extends TankAbstract
     /**
      * @return int
      */
-    public function getTankBarrelX() : int
+    public function getTankBarrelX(): int
     {
         return (int)($this->getTankCenterX() + $this->calculateOffset(Canvas::AXIS_X));
     }
@@ -127,7 +130,7 @@ class Tank extends TankAbstract
     /**
      * @return int
      */
-    public function getTankBarrelY() : int
+    public function getTankBarrelY(): int
     {
         return (int)($this->getTankCenterY() + $this->calculateOffset(Canvas::AXIS_Y));
     }

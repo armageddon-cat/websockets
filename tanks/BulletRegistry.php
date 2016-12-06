@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Tanks;
 
-
 use ClassesAbstract\AbstractRegistry;
 
 /**
@@ -17,7 +16,7 @@ class BulletRegistry extends AbstractRegistry
      * and unset it from registry and tank
      * if it is out of border
      */
-    public static function moveBullets()
+    public static function moveBullets(): void
     {
         $bulletsStorage = self::getInstance();
         $bulletsStorage->rewind();
@@ -35,7 +34,7 @@ class BulletRegistry extends AbstractRegistry
     /**
      * @return self
      */
-    public static function getInstance() : self
+    public static function getInstance(): self
     {
         if (self::$instance === null) {
             self::setInstance(new self);
@@ -51,5 +50,4 @@ class BulletRegistry extends AbstractRegistry
     {
         return parent::current();
     }
-    
 }

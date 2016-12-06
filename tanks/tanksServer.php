@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 namespace Tanks;
+
 use Exceptions\EmptyPayLoadException;
 use Exceptions\InvalidGuidException;
 use Exceptions\JsonDecodingException;
 use WebSocket\WebSocket;
+
 require __DIR__ . '/../vendor/autoload.php';
 
 //$socket   = stream_socket_server('tcp://127.0.0.1:8000', $errNumber, $errString);
@@ -41,9 +43,9 @@ while (true) {
         unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
     }
     if (!empty($read)) {
-//        var_dump('if');
+        //        var_dump('if');
         $serverTime = DateTimeUser::createDateTimeMicro();
-        foreach($read as $currentConnect) {//обрабатываем все соединения
+        foreach ($read as $currentConnect) {//обрабатываем все соединения
             $data = fread($currentConnect, 100000);
             if (!strlen($data)) { //соединение было закрыто
                 fclose($currentConnect);
@@ -56,7 +58,7 @@ while (true) {
         }
         usleep(200000);
     } else {
-//        $k=0;
+        //        $k=0;
 //        var_dump('else');
         $bulletsStorage = BulletRegistry::getInstance();
         $bulletsStorage->rewind();
@@ -66,7 +68,7 @@ while (true) {
 //          BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
         }
         BulletRegistry::moveBullets();
-        foreach($connects as $curConnect) {//обрабатываем все соединения
+        foreach ($connects as $curConnect) {//обрабатываем все соединения
             $storage = TankRegistry::getStorageJSON();
             $encMessage = WebSocket::encode($storage);
 //            fwrite($curConnect, WebSocket::encode('hello'.$k++));
@@ -77,7 +79,6 @@ while (true) {
 //    fwrite($connect, WebSocket::encode('hello'));
     
 //    var_dump('test'.$i++);
-    
 }
 
 fclose($socket);
@@ -85,16 +86,18 @@ fclose($socket);
 /**
  * @param resource $connect
  */
-function onOpen($connect) {
+function onOpen($connect)
+{
     var_dump('connection opened');
     $now = DateTimeUser::createDateTimeMicro();
     $tank = new Tank($now);
     TankRegistry::add($tank);
     $dataObject = (string)$tank;
-    fwrite($connect,  WebSocket::encode($dataObject));
+    fwrite($connect, WebSocket::encode($dataObject));
 }
 
-function onClose() {
+function onClose()
+{
     var_dump('connection lost, sorry');
     // todo in future maybe unset tank here
 }
@@ -109,7 +112,8 @@ function onClose() {
  *
  * @return bool
  */
-function onMessage($connect, $data, \DateTime $serverTime) {
+function onMessage($connect, $data, \DateTime $serverTime)
+{
     //var_dump('Someone Came');
     $decMessage = WebSocket::decode($data);
     if (!$decMessage) {
@@ -163,6 +167,7 @@ function onMessage($connect, $data, \DateTime $serverTime) {
 //    $storage1 = TankRegistry::getStorageJSON();
 //    var_dump('$storage1');
 //    var_dump($storage1);
-    $encmessage = WebSocket::encode($storage);
-    fwrite($connect, $encmessage);
+    $encMessage = WebSocket::encode($storage);
+    fwrite($connect, $encMessage);
+    return true;
 }

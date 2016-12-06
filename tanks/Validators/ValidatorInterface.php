@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Validators;
 
-
 /**
  * Interface ValidatorInterface
  * @package Validators
@@ -14,5 +13,5 @@ interface ValidatorInterface
      *
      * @return bool
      */
-    public static function validate($value) : bool;
+    public static function validate($value): bool;
 }

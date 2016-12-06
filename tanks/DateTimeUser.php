@@ -2,7 +2,10 @@
 declare(strict_types=1);
 namespace Tanks;
 
-
+/**
+ * Class DateTimeUser
+ * @package Tanks
+ */
 class DateTimeUser extends \DateTime
 {
     const UNIX_TIMESTAMP_MICROSECONDS = 'U.u';
@@ -16,7 +19,7 @@ class DateTimeUser extends \DateTime
      *
      * @return string
      */
-    public static function getMicroTimeString(bool $get_as_float = true) : string
+    public static function getMicroTimeString(bool $get_as_float = true): string
     {
         return (string)microtime($get_as_float);
     }
@@ -26,7 +29,7 @@ class DateTimeUser extends \DateTime
      *
      * @return \DateTime
      */
-    public static function createDateTimeMicro() : \DateTime
+    public static function createDateTimeMicro(): \DateTime
     {
         return \DateTime::createFromFormat(self::UNIX_TIMESTAMP_MICROSECONDS, self::getMicroTimeString());
     }

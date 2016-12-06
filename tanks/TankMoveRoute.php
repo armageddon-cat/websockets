@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Tanks;
 
-
 /**
  * Class TankMoveRoute
  * @package Tanks
  */
 class TankMoveRoute
 {
+    const COORDINATES_DIVIDER = ':';
     /**
      *  @param array $storage
      */
@@ -22,13 +22,13 @@ class TankMoveRoute
      */
     public function __construct(Tank $tank)
     {
-        $this->storage[$tank->getTankCenterX().':'.$tank->getTankCenterY()] = new TankMove($tank);
+        $this->storage[$tank->getTankCenterX(). self::COORDINATES_DIVIDER .$tank->getTankCenterY()] = new TankMove($tank);
     }
     
     /**
      * @param Tank $tank
      */
-    public function addMove(Tank $tank)
+    public function addMove(Tank $tank): void
     {
         $firstMove = $this->getFirst();
         $firstMoveTime = (float)$firstMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
@@ -38,13 +38,13 @@ class TankMoveRoute
             reset($this->storage);
             unset($this->storage[key($this->storage)]);
         }
-        $this->storage[$tank->getTankCenterX().':'.$tank->getTankCenterY()] = new TankMove($tank);
+        $this->storage[$tank->getTankCenterX(). self::COORDINATES_DIVIDER .$tank->getTankCenterY()] = new TankMove($tank);
     }
     
     /**
      * @return TankMove
      */
-    public function getFirst() : TankMove
+    public function getFirst(): TankMove
     {
         return reset($this->storage);
     }
@@ -54,7 +54,7 @@ class TankMoveRoute
      *
      * @return TankMove
      */
-    public function getMove(string $id) : TankMove
+    public function getMove(string $id): TankMove
     {
         return $this->storage[$id];
     }
@@ -64,7 +64,7 @@ class TankMoveRoute
      *
      * @return bool
      */
-    public function checkMove(string $id) : bool
+    public function checkMove(string $id): bool
     {
         return isset($this->storage[$id]);
     }
@@ -72,7 +72,7 @@ class TankMoveRoute
     /**
      * @param $id
      */
-    public function removeMove(string $id)
+    public function removeMove(string $id): void
     {
         unset($this->storage[$id]);
     }
@@ -80,7 +80,7 @@ class TankMoveRoute
     /**
      * @return TankMove[]
      */
-    public function getTankMoves() : array
+    public function getTankMoves(): array
     {
         return $this->storage;
     }
@@ -88,7 +88,7 @@ class TankMoveRoute
     /**
      *
      */
-    public function unsetStorage()
+    public function unsetStorage(): void
     {
         $this->storage = [];
     }

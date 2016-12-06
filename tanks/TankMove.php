@@ -3,7 +3,6 @@ declare(strict_types=1);
     
 namespace Tanks;
 
-
 /**
  * Class TankMove
  * @package Tanks
@@ -29,7 +28,7 @@ class TankMove
     /**
      * @return \DateTime
      */
-    public function getTime() : \DateTime
+    public function getTime(): \DateTime
     {
         return $this->time;
     }
@@ -37,7 +36,7 @@ class TankMove
     /**
      * @param \DateTime $time
      */
-    public function setTime(\DateTime $time)
+    public function setTime(\DateTime $time): void
     {
         $this->time = $time;
     }
@@ -45,7 +44,7 @@ class TankMove
     /**
      * @return int
      */
-    public function getX() : int
+    public function getX(): int
     {
         return $this->x;
     }
@@ -53,7 +52,7 @@ class TankMove
     /**
      * @param int $x
      */
-    public function setX(int $x)
+    public function setX(int $x): void
     {
         $this->x = $x;
     }
@@ -61,7 +60,7 @@ class TankMove
     /**
      * @return int
      */
-    public function getY() : int
+    public function getY(): int
     {
         return $this->y;
     }
@@ -69,7 +68,7 @@ class TankMove
     /**
      * @param int $y
      */
-    public function setY(int $y)
+    public function setY(int $y): void
     {
         $this->y = $y;
     }

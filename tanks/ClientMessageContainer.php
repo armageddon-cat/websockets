@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Tanks;
 
-
+use Exceptions\EmptyPayLoadException;
 use Exceptions\EmptyValueException;
 use Exceptions\InvalidGuidException;
 use Exceptions\TankNotExistsException;
@@ -26,6 +26,12 @@ class ClientMessageContainer
      * ClientMessageContainer constructor.
      *
      * @param array $decodedMessage
+     *
+     * @throws \Exceptions\EmptyValueException
+     * @throws \Exceptions\InvalidGuidException
+     * @throws \Exceptions\TankNotExistsException
+     * @throws \Exceptions\JsonDecodingException
+     * @throws \Exceptions\EmptyPayLoadException
      */
     public function __construct(array $decodedMessage)
     {
@@ -40,7 +46,7 @@ class ClientMessageContainer
     /**
      * @return string
      */
-    public function getId() : string
+    public function getId(): string
     {
         return (string)$this->id;
     }
@@ -52,7 +58,7 @@ class ClientMessageContainer
      * @throws \Exceptions\InvalidGuidException
      * @throws \Exceptions\TankNotExistsException
      */
-    protected function setId(\stdClass $payLoadObject)
+    protected function setId(\stdClass $payLoadObject): void
     {
         if (empty($payLoadObject->id)) {
             throw new EmptyValueException('tank id');
@@ -69,7 +75,7 @@ class ClientMessageContainer
     /**
      * @return string
      */
-    public function getType() : string
+    public function getType(): string
     {
         return (string)$this->type;
     }
@@ -78,9 +84,9 @@ class ClientMessageContainer
      * @param \stdClass $payLoadObject
      *
      * @internal param string $type
-     * @throws \Tanks\EmptyValueException
+     * @throws \Exceptions\EmptyValueException
      */
-    protected function setType(\stdClass $payLoadObject)
+    protected function setType(\stdClass $payLoadObject): void
     {
         $this->type = $payLoadObject->type ?? '';
     }
@@ -88,7 +94,7 @@ class ClientMessageContainer
     /**
      * @return int
      */
-    public function getNewd() : int
+    public function getNewd(): int
     {
         return (int)$this->newd;
     }
@@ -98,7 +104,7 @@ class ClientMessageContainer
      *
      * @internal param int $newd
      */
-    protected function setNewd(\stdClass $payLoadObject)
+    protected function setNewd(\stdClass $payLoadObject): void
     {
         $this->newd = $payLoadObject->newd ?? 0;
     }
@@ -106,7 +112,7 @@ class ClientMessageContainer
     /**
      * @return \DateTime
      */
-    public function getTime() : \DateTime
+    public function getTime(): \DateTime
     {
         return $this->time;
     }
@@ -116,7 +122,7 @@ class ClientMessageContainer
      *
      * @internal param \stdClass $time
      */
-    protected function setTime(\stdClass $payLoadObject)
+    protected function setTime(\stdClass $payLoadObject): void
     {
         $this->time = null;
         if (isset($payLoadObject->time)) {
@@ -127,7 +133,7 @@ class ClientMessageContainer
     /**
      * @return string
      */
-    protected function getPayLoad() : string
+    protected function getPayLoad(): string
     {
         return $this->payLoad;
     }
@@ -135,9 +141,9 @@ class ClientMessageContainer
     /**
      * @param array $decodedMessage
      *
-     * @throws \Tanks\EmptyPayLoadException
+     * @throws \Exceptions\EmptyPayLoadException
      */
-    protected function setPayLoad(array $decodedMessage)
+    protected function setPayLoad(array $decodedMessage): void
     {
         if (empty($decodedMessage['payload'])) {
             throw new EmptyPayLoadException();
@@ -149,9 +155,9 @@ class ClientMessageContainer
      * @param string $getPayLoad
      *
      * @return \stdClass
-     * @throws \JsonSchema\Exception\JsonDecodingException
+     * @throws \Exceptions\JsonDecodingException
      */
-    protected function jsonDecodePayLoad(string $getPayLoad) : \stdClass
+    protected function jsonDecodePayLoad(string $getPayLoad): \stdClass
     {
         $decodedPayLoad = json_decode($getPayLoad);
         if ($decodedPayLoad === null) {
@@ -159,5 +165,4 @@ class ClientMessageContainer
         }
         return $decodedPayLoad;
     }
-    
 }

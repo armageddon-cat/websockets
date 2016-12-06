@@ -14,7 +14,7 @@ class TankRegistry extends AbstractRegistry
     /**
      * @return string
      */
-    public static function getStorageJSON() : string
+    public static function getStorageJSON(): string
     {
         $result = [];
         self::getInstance()->rewind();
@@ -28,7 +28,7 @@ class TankRegistry extends AbstractRegistry
     /**
      * @return self
      */
-    public static function getInstance() : self
+    public static function getInstance(): self
     {
         if (self::$instance === null) {
             self::setInstance(new self);
@@ -50,7 +50,7 @@ class TankRegistry extends AbstractRegistry
      *
      * @return Tank
      */
-    public static function get(string $id) : Tank
+    public static function get(string $id): Tank
     {
         return self::getInstance()->offsetGet($id);
     }

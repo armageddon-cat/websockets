@@ -1,8 +1,7 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ClassesAbstract;
-
 
 use Tanks\Bullet;
 use Tanks\Canvas;
@@ -41,7 +40,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @param int $direction
      */
-    public function setDirection(int $direction)
+    public function setDirection(int $direction): void
     {
         $this->direction = $direction;
     }
@@ -57,7 +56,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @return void
      */
-    abstract public function setPath();
+    abstract public function setPath(): void;
     
     /**
      * @return \DateTime[]
@@ -70,7 +69,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @return void
      */
-    abstract public function setPathTime();
+    abstract public function setPathTime(): void;
     
     /**
      * @return Tank
@@ -83,7 +82,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @param Tank $tank
      */
-    public function setTank(Tank $tank)
+    public function setTank(Tank $tank): void
     {
         $this->tank = $tank;
     }
@@ -91,7 +90,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @return \DateTime
      */
-    public function getShootTime() : \DateTime
+    public function getShootTime(): \DateTime
     {
         return $this->shootTime;
     }
@@ -99,7 +98,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @param \DateTime $shootTime
      */
-    public function setShootTime(\DateTime $shootTime)
+    public function setShootTime(\DateTime $shootTime): void
     {
         $this->shootTime = $shootTime;
     }

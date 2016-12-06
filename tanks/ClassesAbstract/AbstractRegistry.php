@@ -1,8 +1,7 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ClassesAbstract;
-
 
 /**
  * Class AbstractRegistry
@@ -13,14 +12,14 @@ abstract class AbstractRegistry extends \ArrayIterator
     protected static $instance;
     
     /**
-     * @return \ArrayIterator
+     * @return \self
      */
     abstract public static function getInstance();
     
     /**
      * @param \ArrayIterator $instance
      */
-    public static function setInstance(\ArrayIterator $instance)
+    public static function setInstance(\ArrayIterator $instance): void
     {
         static::$instance = $instance;
     }
@@ -28,7 +27,7 @@ abstract class AbstractRegistry extends \ArrayIterator
     /**
      * @param PointAbstract $point
      */
-    public static function add(PointAbstract $point)
+    public static function add(PointAbstract $point): void
     {
         static::getInstance()->offsetSet($point->getId(), $point);
     }
@@ -38,7 +37,7 @@ abstract class AbstractRegistry extends \ArrayIterator
      *
      * @return bool
      */
-    public static function exists(string $id) : bool
+    public static function exists(string $id): bool
     {
         return static::getInstance()->offsetExists($id);
     }
@@ -46,12 +45,12 @@ abstract class AbstractRegistry extends \ArrayIterator
     /**
      * @param PointAbstract $point
      */
-    public static function remove(PointAbstract $point)
+    public static function remove(PointAbstract $point): void
     {
         static::getInstance()->offsetUnset($point->getId());
     }
     
-    public static function unsetRegistry()
+    public static function unsetRegistry(): void
     {
         static::$instance = null;
     }

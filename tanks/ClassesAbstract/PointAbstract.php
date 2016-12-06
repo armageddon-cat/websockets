@@ -1,8 +1,7 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ClassesAbstract;
-
 
 /**
  * Class PointAbstract
@@ -25,7 +24,7 @@ abstract class PointAbstract
     /**
      * @param string $id
      */
-    public function setId(string $id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -41,7 +40,7 @@ abstract class PointAbstract
     /**
      * @param int $x
      */
-    public function setX(int $x)
+    public function setX(int $x): void
     {
         $this->x = $x;
     }
@@ -57,7 +56,7 @@ abstract class PointAbstract
     /**
      * @param int $y
      */
-    public function setY(int $y)
+    public function setY(int $y): void
     {
         $this->y = $y;
     }

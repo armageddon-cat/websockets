@@ -1,8 +1,7 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ClassesAbstract;
-
 
 use Tanks\Bullet;
 use Tanks\Canvas;
@@ -41,7 +40,7 @@ abstract class TankAbstract extends PointAbstract
     /**
      * @param int $direction
      */
-    public function setDirection(int $direction)
+    public function setDirection(int $direction): void
     {
         $this->direction = $direction;
     }
@@ -57,7 +56,7 @@ abstract class TankAbstract extends PointAbstract
     /**
      * @param int $status
      */
-    public function setStatus(int $status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -73,7 +72,7 @@ abstract class TankAbstract extends PointAbstract
     /**
      * @param Bullet $bullet
      */
-    public function setBullet(Bullet $bullet)
+    public function setBullet(Bullet $bullet): void
     {
         $this->bullet = $bullet;
     }
@@ -93,7 +92,7 @@ abstract class TankAbstract extends PointAbstract
      *
      * @param \DateTime $time
      */
-    public function setTime(\DateTime $time)
+    public function setTime(\DateTime $time): void
     {
         $this->time = $time;
     }
@@ -102,7 +101,7 @@ abstract class TankAbstract extends PointAbstract
     /**
      * @param Tank $tank
      */
-    public function setRoute(Tank $tank)
+    public function setRoute(Tank $tank): void
     {
         $this->route = new TankMoveRoute($tank);
     }

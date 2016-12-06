@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Tanks;
 
-
 use ClassesAbstract\BulletAbstract;
 
 /**
@@ -37,7 +36,7 @@ class Bullet extends BulletAbstract
      *
      * @return void
      */
-    public function setPath()
+    public function setPath(): void
     {
         $direction = $this->getDirection();
         $tank = $this->getTank();
@@ -63,7 +62,7 @@ class Bullet extends BulletAbstract
      *
      * @return \DateTime
      */
-    public function getBulletTimeByPosition(int $position) : \DateTime
+    public function getBulletTimeByPosition(int $position): \DateTime
     {
         return $this->getPathTime()[$position];
     }
@@ -72,7 +71,7 @@ class Bullet extends BulletAbstract
      * todo kill bullet on intersection
      * return void
      */
-    public function checkIntersection()
+    public function checkIntersection(): void
     {
         $direction = $this->getDirection();
         $tanksStorage = TankRegistry::getInstance();
@@ -113,14 +112,14 @@ class Bullet extends BulletAbstract
     /**
      * @return string
      */
-    public function __toString() : string
+    public function __toString(): string
     {
         $result = [];
         foreach ($this as $key => $value) {
             if (is_object($value)) {
                 continue;
             }
-            if($key === 'path' || $key === 'pathTime') {
+            if ($key === 'path' || $key === 'pathTime') {
                 continue; // todo refactor
             }
             
@@ -129,7 +128,7 @@ class Bullet extends BulletAbstract
         return json_encode($result);
     }
     
-    public function setPathTime()
+    public function setPathTime(): void
     {
         // take microseconds as a number
         $timeStrMicroseconds = (int)$this->getShootTime()->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;
@@ -140,19 +139,19 @@ class Bullet extends BulletAbstract
         }
     }
     
-    public function move()
+    public function move(): void
     {
         $direction = $this->getDirection();
-        if($direction === Canvas::CODE_LEFT_ARROW) {
+        if ($direction === Canvas::CODE_LEFT_ARROW) {
             $this->x -= Bullet::BULLET_STEP;
         }
-        if($direction === Canvas::CODE_UP_ARROW) {
+        if ($direction === Canvas::CODE_UP_ARROW) {
             $this->y -= Bullet::BULLET_STEP;
         }
-        if($direction === Canvas::CODE_RIGHT_ARROW) {
+        if ($direction === Canvas::CODE_RIGHT_ARROW) {
             $this->x += Bullet::BULLET_STEP;
         }
-        if($direction === Canvas::CODE_DOWN_ARROW) {
+        if ($direction === Canvas::CODE_DOWN_ARROW) {
             $this->y += Bullet::BULLET_STEP;
         }
     }
@@ -162,7 +161,7 @@ class Bullet extends BulletAbstract
      *
      * @return bool
      */
-    public function inBounds(BulletAbstract $bullet) : bool
+    public function inBounds(BulletAbstract $bullet): bool
     {
         $bulX = $bullet->getX();
         $bulY = $bullet->getY();
@@ -184,7 +183,7 @@ class Bullet extends BulletAbstract
     {
         $bTimestamp = (float)$bulletTime->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
         $tankRoute  = $tank->getRoute();
-        $index      = $tank->getTankCenterX() . ':' . $tank->getTankCenterY();
+        $index      = $tank->getTankCenterX() . TankMoveRoute::COORDINATES_DIVIDER . $tank->getTankCenterY();
         if ($tankRoute->checkMove($index)) {
             $tankCurrentMove = $tankRoute->getMove($index);
             $tCMTimestamp    = (float)$tankCurrentMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
