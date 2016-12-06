@@ -10,7 +10,7 @@ use ClassesAbstract\AbstractRegistry;
  */
 class TankRegistry extends AbstractRegistry
 {
-    protected static $instance = null;
+    protected static $instance;
     /**
      * @return string
      */

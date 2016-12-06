@@ -3,6 +3,10 @@ declare(strict_types=1);
 namespace Tanks;
 
 
+/**
+ * Class Canvas
+ * @package Tanks
+ */
 class Canvas
 {
     const CANVAS_START = 0;

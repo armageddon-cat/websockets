@@ -11,7 +11,7 @@ use ClassesAbstract\AbstractRegistry;
  */
 class BulletRegistry extends AbstractRegistry
 {
-    protected static $instance = null;
+    protected static $instance;
     /**
      * Move each bullet with one step forward
      * and unset it from registry and tank

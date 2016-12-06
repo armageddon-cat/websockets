@@ -7,12 +7,12 @@ use Exceptions\JsonDecodingException;
 use WebSocket\WebSocket;
 require __DIR__ . '/../vendor/autoload.php';
 
-//$socket   = stream_socket_server('tcp://127.0.0.1:8000', $errno, $errstr);
-$socket = stream_socket_server('tcp://185.154.13.92:8124', $errno, $errstr);
+//$socket   = stream_socket_server('tcp://127.0.0.1:8000', $errNumber, $errString);
+$socket = stream_socket_server('tcp://185.154.13.92:8124', $errNumber, $errString);
 if (!$socket) {
-    die("$errstr ($errno)\n");
+    die("$errString ($errNumber)\n");
 }
-$connects = array();
+$connects = [];
 //$i=0;
 while (true) {
     //формируем массив прослушиваемых сокетов:
@@ -27,7 +27,7 @@ while (true) {
     
     if (in_array($socket, $read)) {//есть новое соединение
         //принимаем новое соединение и производим рукопожатие:
-        if ($connect = stream_socket_accept($socket, -1)) {
+        if ($connect = stream_socket_accept($socket, -1)) { // todo refactor
             /** @var resource $connect */
             $ws = new WebSocket($connect);
             $info = $ws->handshake();
@@ -66,11 +66,11 @@ while (true) {
 //          BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
         }
         BulletRegistry::moveBullets();
-        foreach($connects as $Cconnect) {//обрабатываем все соединения
+        foreach($connects as $curConnect) {//обрабатываем все соединения
             $storage = TankRegistry::getStorageJSON();
-            $encmessage = WebSocket::encode($storage);
-//            fwrite($Cconnect, WebSocket::encode('hello'.$k++));
-            fwrite($Cconnect, $encmessage);
+            $encMessage = WebSocket::encode($storage);
+//            fwrite($curConnect, WebSocket::encode('hello'.$k++));
+            fwrite($curConnect, $encMessage);
         }
         usleep(200000);
     }
@@ -95,7 +95,7 @@ function onOpen($connect) {
 }
 
 function onClose() {
-    var_dump('connection lost, sorian');
+    var_dump('connection lost, sorry');
     // todo in future maybe unset tank here
 }
 
@@ -120,13 +120,7 @@ function onMessage($connect, $data, \DateTime $serverTime) {
 //    var_dump($decMessage);
     try {
         $message = new ClientMessageContainer($decMessage);
-    } catch (EmptyPayLoadException $e) {
-        var_dump($e);
-        return true;
-    } catch (JsonDecodingException $e) {
-        var_dump($e);
-        return true;
-    } catch (InvalidGuidException $e) {
+    } catch (EmptyPayLoadException | JsonDecodingException | InvalidGuidException $e) {
         var_dump($e);
         return true;
     }
@@ -134,7 +128,6 @@ function onMessage($connect, $data, \DateTime $serverTime) {
     if ($message->getType() === ClientMessageContainer::TYPE_BULLET) {
         if (!BulletRegistry::exists($message->getId())) {
             $bullet = new Bullet($message);
-//            BulletRegistry::addBullet($bullet);
             BulletRegistry::add($bullet);
             $tankBullet = TankRegistry::get($message->getId());
             $tankBullet->setBullet($bullet);
@@ -161,7 +154,7 @@ function onMessage($connect, $data, \DateTime $serverTime) {
     }
     BulletRegistry::moveBullets();
     $storage = TankRegistry::getStorageJSON();
-    // after shooting and checking intesection. save tank state. and now we can unset bullets
+    // after shooting and checking intersection. save tank state. and now we can unset bullets
 //    if (count($bullets) !== 0) {
 //        TankRegistry::unsetBullets(); // todo too early unsetting bullets
 //        BulletRegistry::unsetRegistry();//todo refactor

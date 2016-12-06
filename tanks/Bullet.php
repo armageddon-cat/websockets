@@ -85,9 +85,12 @@ class Bullet extends BulletAbstract
             }
             if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
                 for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
+//                    var_dump('TCY'.$tank->getTankCenterY().'TCX'.$tank->getTankCenterX().
+//                             'TCYi'.($tank->getTankCenterY()+$i).'TCXi'.($tank->getTankCenterX()+$i).
+//                             'BY'.($this->getY()).'BX'.($this->getX())); // useful. don't remove
                     if ($tank->getTankCenterY()+$i === $this->getY() && $tank->getTankCenterX()+$i === $this->getX()) {
                         $bulletTime = $this->getBulletTimeByPosition($tank->getTankCenterX() + $i);
-                        if ($this->checkTimeIntersection($bulletTime, $tank)) {// todo refactor in separate methods
+                        if ($this->checkTimeIntersection($bulletTime, $tank)) {
                             break;
                         }
                     }
@@ -128,11 +131,12 @@ class Bullet extends BulletAbstract
     
     public function setPathTime()
     {
-        $timeStrMicroseconds = $this->getShootTime()->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;
+        // take microseconds as a number
+        $timeStrMicroseconds = (int)$this->getShootTime()->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;
         foreach ($this->getPath() as $path) {
             $iteratedDT            = new \DateTime($this->getShootTime()->format(DateTimeUser::DATE_TIME) . '.' . $timeStrMicroseconds);
             $this->pathTime[$path] = $iteratedDT;
-            $timeStrMicroseconds = $iteratedDT->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;
+            $timeStrMicroseconds = (int)$iteratedDT->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;
         }
     }
     
