@@ -26,18 +26,6 @@ class TankRegistry extends AbstractRegistry
     }
     
     /**
-     * @return self
-     */
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) {
-            self::setInstance(new self);
-        }
-        
-        return self::$instance;
-    }
-    
-    /**
      * @return Tank
      */
     public function current(): Tank

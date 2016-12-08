@@ -30,19 +30,7 @@ class BulletRegistry extends AbstractRegistry
             $bulletsStorage->next();
         }
     }
-    
-    /**
-     * @return self
-     */
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) {
-            self::setInstance(new self);
-        }
-        
-        return self::$instance;
-    }
-    
+
     /**
      * @return Bullet
      */

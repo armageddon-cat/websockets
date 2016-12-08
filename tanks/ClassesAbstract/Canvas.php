@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
-namespace Tanks;
+namespace ClassesAbstract;
 
 /**
  * Class Canvas
- * @package Tanks
+ * @package ClassesAbstract
  */
-class Canvas
+abstract class Canvas
 {
     const CANVAS_START = 0;
     const CANVAS_SIZE = 800;
@@ -16,4 +16,5 @@ class Canvas
     const CODE_DOWN_ARROW = 40;
     const AXIS_X = 'x';
     const AXIS_Y = 'y';
+    const CODE_ALL_ARROWS = [self::CODE_LEFT_ARROW, self::CODE_UP_ARROW, self::CODE_RIGHT_ARROW, self::CODE_DOWN_ARROW];
 }

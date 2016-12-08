@@ -2,11 +2,14 @@
 declare(strict_types=1);
 namespace Tanks;
 
+use ClassesAbstract\Canvas;
 use Exceptions\EmptyPayLoadException;
 use Exceptions\EmptyValueException;
+use Exceptions\InvalidDateTimeFormatException;
 use Exceptions\InvalidGuidException;
 use Exceptions\TankNotExistsException;
 use Exceptions\JsonDecodingException;
+use Validators\UnixTimeStampFloatValidator;
 use Validators\GuidValidator;
 
 /**
@@ -21,7 +24,7 @@ class ClientMessageContainer
     private $time;
     private $payLoad;
     const TYPE_BULLET = 'bullet';
-    
+
     /**
      * ClientMessageContainer constructor.
      *
@@ -32,6 +35,7 @@ class ClientMessageContainer
      * @throws \Exceptions\TankNotExistsException
      * @throws \Exceptions\JsonDecodingException
      * @throws \Exceptions\EmptyPayLoadException
+     * @throws \Exceptions\InvalidDateTimeFormatException
      */
     public function __construct(array $decodedMessage)
     {
@@ -66,7 +70,7 @@ class ClientMessageContainer
         if (!GuidValidator::validate($payLoadObject->id)) {
             throw new InvalidGuidException();
         }
-        if (!TankRegistry::exists($payLoadObject->id)) {
+        if (!TankRegistry::exists($payLoadObject->id)) { // todo bullet maybe not exists
             throw new TankNotExistsException();
         }
         $this->id = (string)$payLoadObject->id;
@@ -83,12 +87,15 @@ class ClientMessageContainer
     /**
      * @param \stdClass $payLoadObject
      *
-     * @internal param string $type
      * @throws \Exceptions\EmptyValueException
+     * @return void
      */
     protected function setType(\stdClass $payLoadObject): void
     {
-        $this->type = $payLoadObject->type ?? '';
+        $this->type = '';
+        if (isset($payLoadObject->type) && $payLoadObject->type === self::TYPE_BULLET) { // todo maybe throw exception
+            $this->type = $payLoadObject->type;
+        }
     }
     
     /**
@@ -102,11 +109,14 @@ class ClientMessageContainer
     /**
      * @param \stdClass $payLoadObject
      *
-     * @internal param int $newd
+     * @return void
      */
     protected function setNewd(\stdClass $payLoadObject): void
     {
-        $this->newd = $payLoadObject->newd ?? 0;
+        $this->newd = 0;
+        if (in_array((int)$payLoadObject->newd, Canvas::CODE_ALL_ARROWS, true)) { // todo maybe throw exception
+            $this->newd = (int)$payLoadObject->newd;
+        }
     }
     
     /**
@@ -116,18 +126,19 @@ class ClientMessageContainer
     {
         return $this->time;
     }
-    
+
     /**
+     * maybe fail when milliseconds is null
      * @param \stdClass $payLoadObject
      *
-     * @internal param \stdClass $time
+     * @throws \Exceptions\InvalidDateTimeFormatException
      */
     protected function setTime(\stdClass $payLoadObject): void
     {
-        $this->time = null;
-        if (isset($payLoadObject->time)) {
-            $this->time = \DateTime::createFromFormat(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS, str_replace(',', '.', $payLoadObject->time/1000));
+        if (!isset($payLoadObject->time) || !UnixTimeStampFloatValidator::validate($payLoadObject->time)) {
+            throw new InvalidDateTimeFormatException();
         }
+        $this->time = \DateTime::createFromFormat(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS, (string)$payLoadObject->time); // todo check this
     }
     
     /**

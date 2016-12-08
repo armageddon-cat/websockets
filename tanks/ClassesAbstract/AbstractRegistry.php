@@ -10,11 +10,18 @@ namespace ClassesAbstract;
 abstract class AbstractRegistry extends \ArrayIterator
 {
     protected static $instance;
-    
+
     /**
      * @return \self
      */
-    abstract public static function getInstance();
+    public static function getInstance()
+    {
+        if (static::$instance === null) {
+            static::setInstance(new static);
+        }
+
+        return static::$instance;
+    }
     
     /**
      * @param \ArrayIterator $instance

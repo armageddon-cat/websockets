@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Tanks;
 
 use ClassesAbstract\BulletAbstract;
+use ClassesAbstract\Canvas;
 
 /**
  * Class Bullet

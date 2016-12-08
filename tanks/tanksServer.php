@@ -2,7 +2,8 @@
 declare(strict_types=1);
 namespace Tanks;
 
-use Exceptions\EmptyPayLoadException;
+use Exceptions\EmptyValueException;
+use Exceptions\InvalidDateTimeFormatException;
 use Exceptions\InvalidGuidException;
 use Exceptions\JsonDecodingException;
 use WebSocket\WebSocket;
@@ -124,11 +125,10 @@ function onMessage($connect, $data, \DateTime $serverTime)
 //    var_dump($decMessage);
     try {
         $message = new ClientMessageContainer($decMessage);
-    } catch (EmptyPayLoadException | JsonDecodingException | InvalidGuidException $e) {
+    } catch (EmptyValueException | JsonDecodingException | InvalidGuidException | InvalidDateTimeFormatException $e) {
         var_dump($e);
         return true;
     }
-    
     if ($message->getType() === ClientMessageContainer::TYPE_BULLET) {
         if (!BulletRegistry::exists($message->getId())) {
             $bullet = new Bullet($message);

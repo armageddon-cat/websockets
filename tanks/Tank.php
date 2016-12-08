@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Tanks;
 
+use ClassesAbstract\Canvas;
 use ClassesAbstract\TankAbstract;
 
 /**

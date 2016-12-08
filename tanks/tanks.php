@@ -70,14 +70,16 @@
             if (!(/[0-9abcdef]{8}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{12}/i.test(GUID))) {
                 return;
             }
+            // Date.now() number of milliseconds = 1481111063526 => convert to sec 1481111063,526
+            var dateSeconds = Date.now()/1000;
             if (e.keyCode === CODE_ENTER) { // enter button pushed
-                socket.send(JSON.stringify({'id': GUID, 'type':'bullet', 'time':Date.now()}));
+                socket.send(JSON.stringify({'id': GUID, 'type':'bullet', 'time':dateSeconds}));
                 return;
             }
             if (CODE_ARROWS.indexOf(e.keyCode) === -1) { // not arrow
                 return;
             }
-            buffer = JSON.stringify({'id': GUID, 'newd':e.keyCode, 'time':Date.now()});
+            buffer = JSON.stringify({'id': GUID, 'newd':e.keyCode, 'time':dateSeconds});
         });
 
         socket.onmessage = function (event) {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace ClassesAbstract;
 
 use Tanks\Bullet;
-use Tanks\Canvas;
 use Tanks\Tank;
 
 /**
