@@ -43,9 +43,9 @@
         var socket = new WebSocket("ws://185.154.13.92:8124");
         socket.onclose = function(event) {
             if (event.wasClean) {
-                alert('Connection closed clean');
+                console.log('Connection closed clean');
             } else {
-                alert('Connection lost'); // example: server process was killed
+                console.log('Connection lost'); // example: server process was killed
             }
             console.log('Code: ' + event.code + ' reason: ' + event.reason);
         };
@@ -92,13 +92,11 @@
                 tankData = tempTankData;
             }
             canvasContext.clearRect(0, 0, SIZE_CANVAS, SIZE_CANVAS);
-//            console.log("tankData"); // TODO remove debug!!
-//            console.log(tankData); // TODO remove debug!!
             tankData.forEach(function(item) {
                 var currentTankDataParsed = JSON.parse(item);
-                if (currentTankDataParsed.status == TANK_DEAD) {
-                    return;
-                }
+//                if (currentTankDataParsed.status == TANK_DEAD) {
+//                    return;
+//                }
                 if(currentTankDataParsed.id == GUID) {
                     currentDirectionCode = currentTankDataParsed.direction;
                 }

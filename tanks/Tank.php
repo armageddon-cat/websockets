@@ -52,6 +52,7 @@ class Tank extends TankAbstract
     }
     
     /**
+     * Not used. Replaced with prepareToClientJson
      * @return string
      */
     public function __toString(): string
@@ -68,6 +69,32 @@ class Tank extends TankAbstract
                     }
                     $result[$key] = (string)$value;
                 }
+            }
+        }
+        return json_encode($result);
+    }
+    
+    /**
+     * Fields send to client
+     * id
+     * direction
+     * x
+     * y
+     * bullet
+     * bullet.x
+     * bullet.y
+     *
+     * @return string
+     */
+    public function prepareToClientJson(): string
+    {
+        $result = [];
+        foreach ($this as $property => $value) {
+            if (in_array($property, TankAbstract::CLIENT_FIELDS, true)) {
+                $result[$property] = $value;
+            }
+            if ($value instanceof Bullet) {
+                $result[$property] = $value->prepareToClientJson();
             }
         }
         return json_encode($result);

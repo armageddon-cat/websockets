@@ -27,6 +27,7 @@ abstract class BulletAbstract extends PointAbstract
     const BULLET_FLY_TIME                = self::BULLET_DELAY_REAL * (Canvas::CANVAS_SIZE / Bullet::BULLET_STEP); // 20 * ( 800 / 10 ) = 1600 milsec = 1.6sec
     const BULLET_FLY_TIME_MICROSECONDS   = self::BULLET_FLY_TIME * 1000; // microseconds
     const BULLET_FLY_TIME_SECONDS        = self::BULLET_FLY_TIME / 1000; // seconds
+    const CLIENT_FIELDS = ['x', 'y'];
     
     /**
      * @return int

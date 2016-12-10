@@ -129,6 +129,7 @@ class Bullet extends BulletAbstract
     }
     
     /**
+     * Not used. Replaced with prepareToClientJson
      * @return string
      */
     public function __toString(): string
@@ -143,6 +144,24 @@ class Bullet extends BulletAbstract
             }
             
             $result[$key] = $value;
+        }
+        return json_encode($result);
+    }
+    
+    /**
+     * Fields send to client
+     * x
+     * y
+     *
+     * @return string
+     */
+    public function prepareToClientJson(): string
+    {
+        $result = [];
+        foreach ($this as $property => $value) {
+            if (in_array($property, BulletAbstract::CLIENT_FIELDS, true)) {
+                $result[$property] = $value;
+            }
         }
         return json_encode($result);
     }

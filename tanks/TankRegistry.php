@@ -6,6 +6,11 @@ use ClassesAbstract\AbstractRegistry;
 
 /**
  * Class TankRegistry
+ *
+ * dead tanks have status dead. but not removed from registry.
+ * but don't give them to front
+ * maybe in future some logic on dead tanks
+ *
  * @package Tanks
  */
 class TankRegistry extends AbstractRegistry
@@ -19,7 +24,9 @@ class TankRegistry extends AbstractRegistry
         $result = [];
         self::getInstance()->rewind();
         while (self::getInstance()->valid()) {
-            $result[] = (string)self::getInstance()->current();
+            if (self::getInstance()->current()->getStatus() !== Tank::DEAD) {
+                $result[] = self::getInstance()->current()->prepareToClientJson();
+            }
             self::getInstance()->next();
         }
         return json_encode($result);

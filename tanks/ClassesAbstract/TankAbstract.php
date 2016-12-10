@@ -27,6 +27,7 @@ abstract class TankAbstract extends PointAbstract
     const DEFAULT_TANK_CORS_X      = 150;
     const DEFAULT_TANK_CORS_Y      = 150;
     const DEFAULT_TANK_DIRECTION   = Canvas::CODE_UP_ARROW;
+    const CLIENT_FIELDS = ['id', 'x', 'y', 'direction'];
     
     /**
      * @return int
