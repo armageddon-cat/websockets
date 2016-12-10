@@ -18,44 +18,44 @@ if (!$socket) {
 $connects = [];
 //$i=0;
 while (true) {
-    //формируем массив прослушиваемых сокетов:
+    //form array of sockets to listen to:
     $read   = $connects;
     $read[] = $socket;
     $write  = $except = null;
     
-    if (!stream_select($read, $write, $except, 0, 100000)) {//ожидаем сокеты доступные для чтения (без таймаута)
+    if (!stream_select($read, $write, $except, 0, 100000)) {//waiting for sockets available for read
 //        var_dump('lamda'.$i++);
        // break;
     }
     
-    if (in_array($socket, $read)) {//есть новое соединение
-        //принимаем новое соединение и производим рукопожатие:
+    if (in_array($socket, $read)) {//if there is new connection
+        //accept new connection and doing the handshake:
         if ($connect = stream_socket_accept($socket, -1)) { // todo refactor
             /** @var resource $connect */
             $ws = new WebSocket($connect);
             $info = $ws->handshake();
             
             if ($info) {
-                $connects[] = $connect;//добавляем его в список необходимых для обработки
-                onOpen($connect);//вызываем пользовательский сценарий
+                $connects[] = $connect;//add it to list for work
+                onOpen($connect);//call user scenario
                 //  $data = fread($connect, 100000); instead of info to function
             }
         }
-        unset($read[array_search($socket, $read)]);//далее убираем сокет из списка доступных для чтения
+        unset($read[array_search($socket, $read)]);//then remove from list available for read
     }
     if (!empty($read)) {
         //        var_dump('if');
         $serverTime = DateTimeUser::createDateTimeMicro();
-        foreach ($read as $currentConnect) {//обрабатываем все соединения
+        foreach ($read as $currentConnect) {//working out all connections
             $data = fread($currentConnect, 100000);
-            if (!strlen($data)) { //соединение было закрыто
+            if (!strlen($data)) { //connection was closed
                 fclose($currentConnect);
                 unset($connects[array_search($currentConnect, $connects)]);
-                onClose(/*$currentConnect*/);//вызываем пользовательский сценарий
+                onClose(/*$currentConnect*/);//call user scenario
                 continue;
             }
         
-            onMessage($currentConnect, $data, $serverTime);//вызываем пользовательский сценарий
+            onMessage($currentConnect, $data, $serverTime);//call user scenario
         }
         usleep(200000);
     } else {
@@ -69,7 +69,7 @@ while (true) {
 //          BulletRegistry::removeBullet($bullet->getId());// todo too early unsetting bullets
         }
         BulletRegistry::moveBullets();
-        foreach ($connects as $curConnect) {//обрабатываем все соединения
+        foreach ($connects as $curConnect) {//working out all connections
             $storage = TankRegistry::getStorageJSON();
             $encMessage = WebSocket::encode($storage);
 //            fwrite($curConnect, WebSocket::encode('hello'.$k++));

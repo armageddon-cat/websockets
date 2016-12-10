@@ -43,11 +43,11 @@
         var socket = new WebSocket("ws://185.154.13.92:8124");
         socket.onclose = function(event) {
             if (event.wasClean) {
-                alert('Соединение закрыто чисто');
+                alert('Connection closed clean');
             } else {
-                alert('Обрыв соединения'); // например, "убит" процесс сервера
+                alert('Connection lost'); // example: server process was killed
             }
-            console.log('Код: ' + event.code + ' причина: ' + event.reason);
+            console.log('Code: ' + event.code + ' reason: ' + event.reason);
         };
         socket.onopen = function () {
             console.log("socket opened");
