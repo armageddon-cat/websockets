@@ -55,6 +55,11 @@ class ServerActions
             
             return;
         }
+        if (isset($decMessage['type']) && $decMessage['type'] === 'close') {
+            var_dump('connection closed');
+    
+            return;
+        }
         
         try {
             $message = new ClientMessageContainer($decMessage);

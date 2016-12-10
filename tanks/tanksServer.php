@@ -52,7 +52,6 @@ while (true) {
     
             ServerActions::onMessage($currentConnect, $data, $serverTime);//call user scenario
         }
-        usleep(200000);
     } else {
     // no messages. just send current state
         // make shooting for each present bullet, checking hit
@@ -64,9 +63,8 @@ while (true) {
             $encMessage = WebSocket::encode($storage);
             fwrite($curConnect, $encMessage);
         }
-        usleep(200000);
     }
-//    fwrite($connect, WebSocket::encode('hello'));
+    usleep(200000);
 }
 
 fclose($socket);
