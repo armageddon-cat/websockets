@@ -18,11 +18,27 @@ use Validators\GuidValidator;
  */
 class ClientMessageContainer
 {
+    /**
+     * @var string
+     */
     private $id;
-    private $type;
-    private $newd;
+    /**
+     * @var string
+     */
+    private $type = '';
+    /**
+     * @var int
+     */
+    private $newDirection = 0;
+    /**
+     * @var \DateTime
+     */
     private $time;
+    /**
+     * @var string
+     */
     private $payLoad;
+    
     const TYPE_BULLET = 'bullet';
 
     /**
@@ -43,7 +59,7 @@ class ClientMessageContainer
         $payLoadObject = $this->jsonDecodePayLoad($this->getPayLoad());
         $this->setId($payLoadObject);
         $this->setType($payLoadObject);
-        $this->setNewd($payLoadObject);
+        $this->setNewDirection($payLoadObject);
         $this->setTime($payLoadObject);
     }
     
@@ -101,9 +117,17 @@ class ClientMessageContainer
     /**
      * @return int
      */
-    public function getNewd(): int
+    public function getNewDirection(): int
     {
-        return (int)$this->newd;
+        return $this->newDirection;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function isNewDirection(): bool
+    {
+        return (bool)$this->getNewDirection();
     }
     
     /**
@@ -111,11 +135,11 @@ class ClientMessageContainer
      *
      * @return void
      */
-    protected function setNewd(\stdClass $payLoadObject): void
+    protected function setNewDirection(\stdClass $payLoadObject): void
     {
-        if ($payLoadObject->type !== self::TYPE_BULLET
+        if (!isset($payLoadObject->type) // type is set only for bullet
             && in_array((int)$payLoadObject->newd, Canvas::CODE_ALL_ARROWS, true)) {
-            $this->newd = (int)$payLoadObject->newd;
+            $this->newDirection = (int)$payLoadObject->newd;
         }
     }
     

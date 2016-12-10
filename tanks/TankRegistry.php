@@ -31,9 +31,9 @@ class TankRegistry extends AbstractRegistry
      */
     public static function moveTank(\DateTime $serverTime, ClientMessageContainer $message): void
     {
-        if ($message->getNewd() !== null) {
+        if ($message->isNewDirection()) {
             $tank = TankRegistry::get($message->getId());
-            $tank->setDirection($message->getNewd());
+            $tank->setDirection($message->getNewDirection());
             $clientTime = $message->getTime();
             $interval   = $clientTime->diff($serverTime);
             $time       = $serverTime;
