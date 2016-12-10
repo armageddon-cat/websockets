@@ -113,7 +113,6 @@ class ClientMessageContainer
      */
     protected function setNewd(\stdClass $payLoadObject): void
     {
-        $this->newd = 0;
         if ($payLoadObject->type !== self::TYPE_BULLET
             && in_array((int)$payLoadObject->newd, Canvas::CODE_ALL_ARROWS, true)) {
             $this->newd = (int)$payLoadObject->newd;

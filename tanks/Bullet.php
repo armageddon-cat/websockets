@@ -29,6 +29,23 @@ class Bullet extends BulletAbstract
     }
     
     /**
+     * @param ClientMessageContainer $message
+     *
+     * @return void
+     */
+    public static function create(ClientMessageContainer $message): void
+    {
+        if ($message->getType() === ClientMessageContainer::TYPE_BULLET) {
+            if (!BulletRegistry::exists($message->getId())) {
+                $bullet = new self($message);
+                BulletRegistry::add($bullet);
+                $tank = TankRegistry::get($message->getId());
+                $tank->setBullet($bullet);
+            }
+        }
+    }
+    
+    /**
      * canvas has form
      * 0 xx 100
      * y
@@ -69,10 +86,9 @@ class Bullet extends BulletAbstract
     }
     
     /**
-     * todo kill bullet on intersection
-     * return void
+     * return bool
      */
-    public function checkIntersection(): void
+    public function isHit(): bool
     {
         $direction = $this->getDirection();
         $tanksStorage = TankRegistry::getInstance();
@@ -91,7 +107,7 @@ class Bullet extends BulletAbstract
                     if ($tank->getTankCenterY()+$i === $this->getY() && $tank->getTankCenterX()+$i === $this->getX()) {
                         $bulletTime = $this->getBulletTimeByPosition($tank->getTankCenterX() + $i);
                         if ($this->checkTimeIntersection($bulletTime, $tank)) {
-                            break;
+                            return true;
                         }
                     }
                 }
@@ -101,13 +117,15 @@ class Bullet extends BulletAbstract
                     if ($tank->getTankCenterX()+$i === $this->getX() && $tank->getTankCenterY()+$i === $this->getY()) {
                         $bulletTime = $this->getBulletTimeByPosition($tank->getTankCenterY() + $i);
                         if ($this->checkTimeIntersection($bulletTime, $tank)) {
-                            break;
+                            return true;
                         }
                     }
                 }
             }
             $tanksStorage->next();
         }
+        
+        return false;
     }
     
     /**
@@ -201,8 +219,8 @@ class Bullet extends BulletAbstract
             }
             if ($bTimestamp > $tCMTimestamp) {
                 $tank->setStatus(Tank::DEAD);
+                return true;
             }
-            return true;
         }
         return false;
     }

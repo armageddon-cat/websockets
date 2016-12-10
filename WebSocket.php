@@ -1,10 +1,9 @@
 <?php
 namespace WebSocket;
+
 /**
- * Created by PhpStorm.
- * User: sera
- * Date: 16.06.2016
- * Time: 16:27
+ * Class WebSocket
+ * @package WebSocket
  */
 class WebSocket
 {
@@ -22,10 +21,13 @@ class WebSocket
         }
         $this->connect = $connect;
     }
-
+    
+    /**
+     * @return array|bool
+     */
     public function handshake()
     {
-        $info = array();
+        $info = [];
 
         $line           = fgets($this->connect);
         $header         = explode(' ', $line);
@@ -62,14 +64,16 @@ class WebSocket
     }
     
     /**
+     * todo Inconsistent return
+     *
      * @param $data
      *
      * @return array|bool
      */
-    public static function decode($data)
+    public static function decode(string $data)
     {
         $unmaskedPayload = '';
-        $decodedData = array();
+        $decodedData = [];
         
         // estimate frame type:
         $firstByteBinary = sprintf('%08b', ord($data[0]));
@@ -80,7 +84,7 @@ class WebSocket
         
         // unmasked frame is received:
         if (!$isMasked) {
-            return array('type' => '', 'payload' => '', 'error' => 'protocol error (1002)');
+            return ['type' => '', 'payload' => '', 'error' => 'protocol error (1002)'];
         }
         
         switch ($opcode) {
@@ -109,7 +113,7 @@ class WebSocket
                 break;
             
             default:
-                return array('type' => '', 'payload' => '', 'error' => 'unknown opcode (1003)');
+                return ['type' => '', 'payload' => '', 'error' => 'unknown opcode (1003)'];
         }
         
         if ($payloadLength === 126) {
@@ -134,7 +138,7 @@ class WebSocket
         /**
          * We have to check for large frames here. socket_recv cuts at 1024 bytes
          * so if websocket-frame is > 1024 bytes we have to wait until whole
-         * data is transferd.
+         * data is transferred.
          */
         if (strlen($data) < $dataLength) {
             return false;
@@ -155,10 +159,17 @@ class WebSocket
         
         return $decodedData;
     }
-
-    public static function encode($payload, $type = 'text', $masked = false)
+    
+    /**
+     * @param string $payload
+     * @param string $type
+     * @param bool   $masked
+     *
+     * @return string
+     */
+    public static function encode(string $payload, string $type = 'text', bool $masked = false) : string
     {
-        $frameHead = array();
+        $frameHead = [];
         $payloadLength = strlen($payload);
         
         switch ($type) {
@@ -191,8 +202,9 @@ class WebSocket
                 $frameHead[$i + 2] = bindec($payloadLengthBin[$i]);
             }
             // most significant bit MUST be 0
-            if ($frameHead[2] > 127) {
-                return array('type' => '', 'payload' => '', 'error' => 'frame too large (1004)');
+            if ($frameHead[2] > 127) { // todo it returned an array. changed to string. check how it works
+                $frame = implode('', ['type' => '', 'payload' => '', 'error' => 'frame too large (1004)']);
+                return $frame;
             }
         } elseif ($payloadLength > 125) {
             $payloadLengthBin = str_split(sprintf('%016b', $payloadLength), 8);
@@ -209,7 +221,7 @@ class WebSocket
         }
         if ($masked === true) {
             // generate a random mask:
-            $mask = array();
+            $mask = [];
             for ($i = 0; $i < 4; $i++) {
                 $mask[$i] = chr(rand(0, 255));
             }

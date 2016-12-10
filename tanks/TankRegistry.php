@@ -26,6 +26,26 @@ class TankRegistry extends AbstractRegistry
     }
     
     /**
+     * @param \DateTime              $serverTime
+     * @param ClientMessageContainer $message
+     */
+    public static function moveTank(\DateTime $serverTime, ClientMessageContainer $message): void
+    {
+        if ($message->getNewd() !== null) {
+            $tank = TankRegistry::get($message->getId());
+            $tank->setDirection($message->getNewd());
+            $clientTime = $message->getTime();
+            $interval   = $clientTime->diff($serverTime);
+            $time       = $serverTime;
+            if ((int)$interval->format('%Y%m%d%H%m%s') === 0) { // if difference more than 1 second use server time
+                $time = $clientTime;
+            }
+            
+            $tank->moveTank($time);
+        }
+    }
+    
+    /**
      * @return Tank
      */
     public function current(): Tank

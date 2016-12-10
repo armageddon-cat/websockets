@@ -30,6 +30,23 @@ class BulletRegistry extends AbstractRegistry
             $bulletsStorage->next();
         }
     }
+    
+    /**
+     * @return void
+     */
+    public static function fire(): void
+    {
+        $bulletsStorage = self::getInstance();
+        $bulletsStorage->rewind();
+        while ($bulletsStorage->valid()) {
+            $bullet = $bulletsStorage->current();
+            if ($bullet->isHit()) {
+                self::remove($bullet);
+                $bullet->getTank()->unsetBullet();
+            }
+            $bulletsStorage->next();
+        }
+    }
 
     /**
      * @return Bullet
