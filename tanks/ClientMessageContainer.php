@@ -86,7 +86,7 @@ class ClientMessageContainer
         if (!GuidValidator::validate($payLoadObject->id)) {
             throw new InvalidGuidException();
         }
-        if (!TankRegistry::exists($payLoadObject->id)) { // todo bullet maybe not exists
+        if (!TankRegistry::exists($payLoadObject->id)) {
             throw new TankNotExistsException();
         }
         $this->id = (string)$payLoadObject->id;
@@ -97,7 +97,7 @@ class ClientMessageContainer
      */
     public function getType(): string
     {
-        return (string)$this->type;
+        return $this->type;
     }
     
     /**

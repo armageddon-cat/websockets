@@ -28,7 +28,7 @@ class ServerActions
         $now  = DateTimeUser::createDateTimeMicro();
         $tank = new Tank($now);
         TankRegistry::add($tank);
-        $tankString = (string)$tank; // todo make without magic toString method
+        $tankString = $tank->prepareToClientJson();
         fwrite($connect, WebSocket::encode($tankString));
     }
     
