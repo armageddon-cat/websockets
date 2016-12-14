@@ -16,25 +16,24 @@
         IMAGE_OFFSET_X = 150;
         IMAGE_OFFSET_Y = 150;
         SIZE_IMAGE = 100;
+        SIZE_IMAGE_HALF = SIZE_IMAGE * 0.5;
         SIZE_CANVAS = 800;
         CODE_LEFT_ARROW = 37;
         CODE_UP_ARROW = 38;
         CODE_RIGHT_ARROW = 39;
         CODE_DOWN_ARROW = 40;
         CODE_ENTER = 13;
-        CODE_ARROWS = [37, 38, 39, 40];
-        TRANSLATE_VALUE_X = IMAGE_OFFSET_X+SIZE_IMAGE*0.5;
-        TRANSLATE_VALUE_Y = IMAGE_OFFSET_Y+SIZE_IMAGE*0.5;
-        TRANSLATE_VALUE_NEGATIVE_X = -(IMAGE_OFFSET_X+SIZE_IMAGE*0.5);
-        TRANSLATE_VALUE_NEGATIVE_Y = -(IMAGE_OFFSET_Y+SIZE_IMAGE*0.5);
+        CODE_ARROWS = [CODE_LEFT_ARROW, CODE_UP_ARROW, CODE_RIGHT_ARROW, CODE_DOWN_ARROW];
+        TRANSLATE_VALUE_X = IMAGE_OFFSET_X+SIZE_IMAGE_HALF;
+        TRANSLATE_VALUE_Y = IMAGE_OFFSET_Y+SIZE_IMAGE_HALF;
+        TRANSLATE_VALUE_X_NEGATIVE = -(IMAGE_OFFSET_X+SIZE_IMAGE_HALF);
+        TRANSLATE_VALUE_Y_NEGATIVE = -(IMAGE_OFFSET_Y+SIZE_IMAGE_HALF);
         RAD_TO_DEG = Math.PI/180;
         ROTATE_COUNTERCLOCKWISE = RAD_TO_DEG*270;
         ROTATE_CLOCKWISE = RAD_TO_DEG*90;
         ROTATE_OPPOSITE = RAD_TO_DEG*180;
-        TANK_DEAD = 0;
+        TANK_DEAD = 0; // todo no usages
         BULLET_SIZE = 10;
-        BULLET_DELAY = 300;
-        BULLET_STEP = 10;
         GUID = 'undefined';
         tankData = [];
         buffer = '';
@@ -57,14 +56,12 @@
         var canvasContext = canvas.getContext('2d');
         canvasContext.save();
         canvasContext.drawImage(img, IMAGE_OFFSET_X, IMAGE_OFFSET_Y);
-        currentDirectionCode = CODE_LEFT_ARROW;
-        setInterval( function() {
-            if(buffer != '') {
-    
+        setInterval(function () {
+            if (buffer != '') {
                 socket.send(buffer);
             }
             buffer = '';
-        } , 200);
+        }, 200);
 
         window.addEventListener('keydown', function (e) {
             if (!(/[0-9abcdef]{8}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{4}-[0-9abcdef]{12}/i.test(GUID))) {
@@ -95,11 +92,8 @@
             tankData.forEach(function(item) {
                 var currentTankDataParsed = JSON.parse(item);
 //                if (currentTankDataParsed.status == TANK_DEAD) {
-//                    return;
+//                    return;  // maybe in future some logic
 //                }
-                if(currentTankDataParsed.id == GUID) {
-                    currentDirectionCode = currentTankDataParsed.direction;
-                }
                 tankLogic(currentTankDataParsed);
             });
             
@@ -119,7 +113,7 @@
             if (currentTankData.direction == CODE_DOWN_ARROW) {
                 canvasContext.rotate(ROTATE_COUNTERCLOCKWISE);
             }
-            canvasContext.translate(TRANSLATE_VALUE_NEGATIVE_X, TRANSLATE_VALUE_NEGATIVE_Y);
+            canvasContext.translate(TRANSLATE_VALUE_X_NEGATIVE, TRANSLATE_VALUE_Y_NEGATIVE);
             canvasContext.drawImage(img, currentTankData.x, currentTankData.y);
             canvasContext.restore();
             //--------------------bullet animation-------------------------------------
@@ -131,10 +125,10 @@
         }
 
         function recalcTranslate(currentTankData) {
-            TRANSLATE_VALUE_X = currentTankData.x+SIZE_IMAGE*0.5;
-            TRANSLATE_VALUE_Y = currentTankData.y+SIZE_IMAGE*0.5;
-            TRANSLATE_VALUE_NEGATIVE_X = -(currentTankData.x+SIZE_IMAGE*0.5);
-            TRANSLATE_VALUE_NEGATIVE_Y = -(currentTankData.y+SIZE_IMAGE*0.5);
+            TRANSLATE_VALUE_X = currentTankData.x+SIZE_IMAGE_HALF;
+            TRANSLATE_VALUE_Y = currentTankData.y+SIZE_IMAGE_HALF;
+            TRANSLATE_VALUE_X_NEGATIVE = -(currentTankData.x+SIZE_IMAGE_HALF);
+            TRANSLATE_VALUE_Y_NEGATIVE = -(currentTankData.y+SIZE_IMAGE_HALF);
         }
     </script>
 </body>
