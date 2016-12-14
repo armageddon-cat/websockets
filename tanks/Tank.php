@@ -52,29 +52,6 @@ class Tank extends TankAbstract
     }
     
     /**
-     * Not used. Replaced with prepareToClientJson
-     * @return string
-     */
-    public function __toString(): string
-    {
-        $result = [];
-        foreach ($this as $key => $value) {
-            $result[$key] = $value;
-            if (is_object($value)) {
-                if ($value instanceof \DateTime) {
-                    $result[$key] = $value->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS_SHORT);
-                } else {
-                    if ($value instanceof TankMoveRoute) {
-                        continue;
-                    }
-                    $result[$key] = (string)$value;
-                }
-            }
-        }
-        return json_encode($result);
-    }
-    
-    /**
      * Fields send to client
      * id
      * direction

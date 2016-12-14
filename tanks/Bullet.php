@@ -21,7 +21,7 @@ class Bullet extends BulletAbstract
         $this->setId($cliMessage->getId());
         $this->setTank(TankRegistry::get($this->getId()));
         $this->setDirection($this->getTank()->getDirection());
-        $this->setPath(); // todo check if needed
+        $this->setPath();
         $this->setX($this->getTank()->getTankBarrelX());
         $this->setY($this->getTank()->getTankBarrelY());
         $this->setShootTime($cliMessage->getTime());
@@ -80,17 +80,20 @@ class Bullet extends BulletAbstract
      *
      * @return \DateTime
      */
-    public function getBulletTimeByPosition(int $position): \DateTime
+    public function getBulletTimeOnPosition(int $position): \DateTime
     {
         return $this->getPathTime()[$position];
     }
     
     /**
+     * var_dump('TCY'.$tank->getTankCenterY().'TCX'.$tank->getTankCenterX().
+     * 'TCYi'.($tank->getTankCenterY()+$offset).'TCXi'.($tank->getTankCenterX()+$offset).
+     * 'BY'.($this->getY()).'BX'.($this->getX())); // useful. don't remove
+     *
      * return bool
      */
     public function isHit(): bool
     {
-        $direction = $this->getDirection();
         $tanksStorage = TankRegistry::getInstance();
         $tanksStorage->rewind();
         while ($tanksStorage->valid()) {
@@ -99,26 +102,14 @@ class Bullet extends BulletAbstract
                 $tanksStorage->next();
                 continue;
             }
-            if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
-                for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
-//                    var_dump('TCY'.$tank->getTankCenterY().'TCX'.$tank->getTankCenterX().
-//                             'TCYi'.($tank->getTankCenterY()+$i).'TCXi'.($tank->getTankCenterX()+$i).
-//                             'BY'.($this->getY()).'BX'.($this->getX())); // useful. don't remove
-                    if ($tank->getTankCenterY()+$i === $this->getY() && $tank->getTankCenterX()+$i === $this->getX()) {
-                        $bulletTime = $this->getBulletTimeByPosition($tank->getTankCenterX() + $i);
-                        if ($this->checkTimeIntersection($bulletTime, $tank)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
-                for ($i = -Tank::TANK_HIT_AREA; $i <= Tank::TANK_HIT_AREA; $i++) { // intersection area = tank center +- 20
-                    if ($tank->getTankCenterX()+$i === $this->getX() && $tank->getTankCenterY()+$i === $this->getY()) {
-                        $bulletTime = $this->getBulletTimeByPosition($tank->getTankCenterY() + $i);
-                        if ($this->checkTimeIntersection($bulletTime, $tank)) {
-                            return true;
-                        }
+
+            // intersection area = tank center +- 20 points to axis opposite to bullet direction
+            for ($offset = -Tank::TANK_HIT_AREA; $offset <= Tank::TANK_HIT_AREA; $offset++) {
+                if ($tank->getTankCenterX() + $offset === $this->getX() && $tank->getTankCenterY() + $offset === $this->getY()) {
+                    $bulletIntersectionPosition = $this->bulletIntersectionPosition($tank, $offset);
+                    $bulletTime = $this->getBulletTimeOnPosition($bulletIntersectionPosition);
+                    if ($this->checkTimeIntersection($bulletTime, $tank)) {
+                        return true;
                     }
                 }
             }
@@ -126,26 +117,6 @@ class Bullet extends BulletAbstract
         }
         
         return false;
-    }
-    
-    /**
-     * Not used. Replaced with prepareToClientJson
-     * @return string
-     */
-    public function __toString(): string
-    {
-        $result = [];
-        foreach ($this as $key => $value) {
-            if (is_object($value)) {
-                continue;
-            }
-            if ($key === 'path' || $key === 'pathTime') {
-                continue; // todo refactor
-            }
-            
-            $result[$key] = $value;
-        }
-        return json_encode($result);
     }
     
     /**
@@ -242,5 +213,22 @@ class Bullet extends BulletAbstract
             }
         }
         return false;
+    }
+
+    /**
+     * @param Tank $tank
+     * @param int  $offset
+     *
+     * @return int
+     */
+    protected function bulletIntersectionPosition(Tank $tank, int $offset): int
+    {
+        $direction = $this->getDirection();
+        $position = $tank->getTankCenterX() + $offset;
+        if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
+            $position = $tank->getTankCenterY() + $offset;
+        }
+
+        return $position;
     }
 }

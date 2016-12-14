@@ -55,7 +55,7 @@ while (true) {
     } else {
     // no messages. just send current state
         // make shooting for each present bullet, checking hit
-        BulletRegistry::fire();
+        BulletRegistry::fireEach();
         // move one step forward each existing bullet
         BulletRegistry::moveBullets();
         foreach ($connects as $curConnect) {//working out all connections

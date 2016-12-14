@@ -34,7 +34,7 @@ class BulletRegistry extends AbstractRegistry
     /**
      * @return void
      */
-    public static function fire(): void
+    public static function fireEach(): void
     {
         $bulletsStorage = self::getInstance();
         $bulletsStorage->rewind();

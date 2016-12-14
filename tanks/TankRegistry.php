@@ -36,17 +36,12 @@ class TankRegistry extends AbstractRegistry
      * @param \DateTime              $serverTime
      * @param ClientMessageContainer $message
      */
-    public static function moveTank(\DateTime $serverTime, ClientMessageContainer $message): void
+    public static function moveEach(\DateTime $serverTime, ClientMessageContainer $message): void
     {
         if ($message->isNewDirection()) {
             $tank = TankRegistry::get($message->getId());
             $tank->setDirection($message->getNewDirection());
-            $clientTime = $message->getTime();
-            $interval   = $clientTime->diff($serverTime);
-            $time       = $serverTime;
-            if ((int)$interval->format('%Y%m%d%H%m%s') === 0) { // if difference more than 1 second use server time
-                $time = $clientTime;
-            }
+            $time = self::selectCorrectTime($serverTime, $message);
             
             $tank->moveTank($time);
         }
@@ -68,5 +63,25 @@ class TankRegistry extends AbstractRegistry
     public static function get(string $id): Tank
     {
         return self::getInstance()->offsetGet($id);
+    }
+
+    /**
+     * @param \DateTime              $serverTime
+     * @param ClientMessageContainer $message
+     *
+     * @return \DateTime
+     */
+    protected static function selectCorrectTime(\DateTime $serverTime, ClientMessageContainer $message): \DateTime
+    {
+        $clientTime = $message->getTime();
+        $interval = $clientTime->diff($serverTime);
+        $time = $serverTime;
+        if ((int)$interval->format('%Y%m%d%H%m%s') === 0) { // if difference more than 1 second use server time
+            $time = $clientTime;
+
+            return $time;
+        }
+
+        return $time;
     }
 }

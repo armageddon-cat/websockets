@@ -71,9 +71,9 @@ class ServerActions
         // create bullet if exists
         Bullet::create($message);
         // move tank if tank has new direction
-        TankRegistry::moveTank($serverTime, $message);
+        TankRegistry::moveEach($serverTime, $message);
         // make shooting for each present bullet, checking hit
-        BulletRegistry::fire();
+        BulletRegistry::fireEach();
         // move one step forward each existing bullet
         BulletRegistry::moveBullets();
         // now we can send result back
