@@ -18,16 +18,16 @@ abstract class TankAbstract extends PointAbstract
     protected $bullet;
     protected $time;
     protected $route;
-    const TANK_STEP                = 10;
-    const TANK_SIZE                = 100;
-    const TANK_HIT_AREA            = 20;
-    const DEAD                     = 0;
-    const ALIVE                    = 1;
-    const TANK_BARREL_OFFSET_VALUE = 60;
-    const DEFAULT_TANK_CORS_X      = 150;
-    const DEFAULT_TANK_CORS_Y      = 150;
-    const DEFAULT_TANK_DIRECTION   = Canvas::CODE_UP_ARROW;
-    const CLIENT_FIELDS = ['id', 'x', 'y', 'direction'];
+    public const TANK_STEP = 10;
+    public const TANK_SIZE = 100;
+    public const TANK_HIT_AREA = 20;
+    public const DEAD = 0;
+    public const ALIVE = 1;
+    public const TANK_BARREL_OFFSET_VALUE = 60;
+    public const DEFAULT_TANK_CORS_X = 150;
+    public const DEFAULT_TANK_CORS_Y = 150;
+    public const DEFAULT_TANK_DIRECTION = Canvas::CODE_UP_ARROW;
+    public const CLIENT_FIELDS = ['id', 'x', 'y', 'direction'];
     
     /**
      * @return int

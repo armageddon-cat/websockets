@@ -9,7 +9,7 @@ namespace Tanks;
  */
 class TankMoveRoute
 {
-    const COORDINATES_DIVIDER = ':';
+    public const COORDINATES_DIVIDER = ':';
     /**
      *  @param array $storage
      */

@@ -8,9 +8,9 @@ namespace Tanks;
  */
 class DateTimeUser extends \DateTime
 {
-    const UNIX_TIMESTAMP_MICROSECONDS = 'U.u';
-    const UNIX_TIMESTAMP_MICROSECONDS_SHORT = 'Uu';
-    const DATE_TIME = 'Y-m-d H:i:s';
+    public const UNIX_TIMESTAMP_MICROSECONDS = 'U.u';
+    public const UNIX_TIMESTAMP_MICROSECONDS_SHORT = 'Uu';
+    public const DATE_TIME = 'Y-m-d H:i:s';
     
     /**
      * Returns "(string)microtime(true)" value

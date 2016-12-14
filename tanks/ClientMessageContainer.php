@@ -39,7 +39,7 @@ class ClientMessageContainer
      */
     private $payLoad;
     
-    const TYPE_BULLET = 'bullet';
+    public const TYPE_BULLET = 'bullet';
 
     /**
      * ClientMessageContainer constructor.
