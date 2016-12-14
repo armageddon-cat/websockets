@@ -139,4 +139,12 @@ class Tank extends TankAbstract
     {
         return (int)($this->getTankCenterY() + $this->calculateOffset(Canvas::AXIS_Y));
     }
+
+    /**
+     * @return bool
+     */
+    public function isAlive(): bool
+    {
+        return $this->getStatus() === TankAbstract::ALIVE;
+    }
 }

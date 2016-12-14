@@ -103,6 +103,11 @@ class Bullet extends BulletAbstract
                 continue;
             }
 
+            if (!$tank->isAlive()) {
+                $tanksStorage->next();
+                continue;
+            }
+
             // intersection area = tank center +- 20 points to axis opposite to bullet direction
             for ($offset = -Tank::TANK_HIT_AREA; $offset <= Tank::TANK_HIT_AREA; $offset++) {
                 if ($tank->getTankCenterX() + $offset === $this->getX() && $tank->getTankCenterY() + $offset === $this->getY()) {
