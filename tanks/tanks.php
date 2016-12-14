@@ -115,6 +115,10 @@
             }
             canvasContext.translate(TRANSLATE_VALUE_X_NEGATIVE, TRANSLATE_VALUE_Y_NEGATIVE);
             canvasContext.drawImage(img, currentTankData.x, currentTankData.y);
+            if (GUID == currentTankData.id) {
+                canvasContext.fillStyle = "rgba(255, 255, 0, 0.5)";
+                canvasContext.fillRect(TRANSLATE_VALUE_X, TRANSLATE_VALUE_Y, BULLET_SIZE, BULLET_SIZE);
+            }
             canvasContext.restore();
             //--------------------bullet animation-------------------------------------
             if (currentTankData.bullet && currentTankData.bullet != '' && currentTankData.bullet != null) {
