@@ -54,7 +54,7 @@ class Bullet extends BulletAbstract
      *
      * @return void
      */
-    public function setPath(): void
+    protected function setPath(): void
     {
         $direction = $this->getDirection();
         $tank = $this->getTank();
@@ -141,8 +141,8 @@ class Bullet extends BulletAbstract
         }
         return json_encode($result);
     }
-    
-    public function setPathTime(): void
+
+    protected function setPathTime(): void
     {
         // take microseconds as a number
         $timeStrMicroseconds = (int)$this->getShootTime()->format('u') + self::BULLET_DELAY_REAL_MICROSECONDS;

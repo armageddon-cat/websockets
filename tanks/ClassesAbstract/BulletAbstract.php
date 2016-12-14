@@ -40,7 +40,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @param int $direction
      */
-    public function setDirection(int $direction): void
+    protected function setDirection(int $direction): void
     {
         $this->direction = $direction;
     }
@@ -56,7 +56,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @return void
      */
-    abstract public function setPath(): void;
+    abstract protected function setPath(): void;
     
     /**
      * @return \DateTime[]
@@ -69,7 +69,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @return void
      */
-    abstract public function setPathTime(): void;
+    abstract protected function setPathTime(): void;
     
     /**
      * @return Tank
@@ -82,7 +82,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @param Tank $tank
      */
-    public function setTank(Tank $tank): void
+    protected function setTank(Tank $tank): void
     {
         $this->tank = $tank;
     }
@@ -98,7 +98,7 @@ abstract class BulletAbstract extends PointAbstract
     /**
      * @param \DateTime $shootTime
      */
-    public function setShootTime(\DateTime $shootTime): void
+    protected function setShootTime(\DateTime $shootTime): void
     {
         $this->shootTime = $shootTime;
     }

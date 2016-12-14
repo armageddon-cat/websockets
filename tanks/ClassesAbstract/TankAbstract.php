@@ -92,7 +92,7 @@ abstract class TankAbstract extends PointAbstract
      *
      * @param \DateTime $time
      */
-    public function setTime(\DateTime $time): void
+    protected function setTime(\DateTime $time): void
     {
         $this->time = $time;
     }
@@ -101,7 +101,7 @@ abstract class TankAbstract extends PointAbstract
     /**
      * @param Tank $tank
      */
-    public function setRoute(Tank $tank): void
+    protected function setRoute(Tank $tank): void
     {
         $this->route = new TankMoveRoute($tank);
     }

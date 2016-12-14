@@ -36,7 +36,7 @@ class TankMove
     /**
      * @param \DateTime $time
      */
-    public function setTime(\DateTime $time): void
+    protected function setTime(\DateTime $time): void
     {
         $this->time = $time;
     }
@@ -52,7 +52,7 @@ class TankMove
     /**
      * @param int $x
      */
-    public function setX(int $x): void
+    protected function setX(int $x): void
     {
         $this->x = $x;
     }
@@ -68,7 +68,7 @@ class TankMove
     /**
      * @param int $y
      */
-    public function setY(int $y): void
+    protected function setY(int $y): void
     {
         $this->y = $y;
     }

@@ -24,7 +24,7 @@ abstract class PointAbstract
     /**
      * @param string $id
      */
-    public function setId(string $id): void
+    protected function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -40,7 +40,7 @@ abstract class PointAbstract
     /**
      * @param int $x
      */
-    public function setX(int $x): void
+    protected function setX(int $x): void
     {
         $this->x = $x;
     }
@@ -56,7 +56,7 @@ abstract class PointAbstract
     /**
      * @param int $y
      */
-    public function setY(int $y): void
+    protected function setY(int $y): void
     {
         $this->y = $y;
     }
