@@ -87,8 +87,8 @@ class Bullet extends BulletAbstract
     
     /**
      * var_dump('TCY'.$tank->getTankCenterY().'TCX'.$tank->getTankCenterX().
-     * 'TCYi'.($tank->getTankCenterY()+$offset).'TCXi'.($tank->getTankCenterX()+$offset).
-     * 'BY'.($this->getY()).'BX'.($this->getX())); // useful. don't remove
+       'TCYi'.($tank->getTankCenterY()+$offsetY).'TCXi'.($tank->getTankCenterX()+$offsetX).
+       'BY'.($this->getY()).'BX'.($this->getX())); // useful. don't remove
      *
      * return bool
      */
@@ -109,12 +109,16 @@ class Bullet extends BulletAbstract
             }
 
             // intersection area = tank center +- 20 points to axis opposite to bullet direction
-            for ($offset = -Tank::TANK_HIT_AREA; $offset <= Tank::TANK_HIT_AREA; $offset++) {
-                if ($tank->getTankCenterX() + $offset === $this->getX() && $tank->getTankCenterY() + $offset === $this->getY()) {
-                    $bulletIntersectionPosition = $this->bulletIntersectionPosition($tank, $offset);
-                    $bulletTime = $this->getBulletTimeOnPosition($bulletIntersectionPosition);
-                    if ($this->checkTimeIntersection($bulletTime, $tank)) {
-                        return true;
+            for ($offsetX = -Tank::TANK_HIT_AREA; $offsetX <= Tank::TANK_HIT_AREA; $offsetX++) {
+                for ($offsetY = -Tank::TANK_HIT_AREA; $offsetY <= Tank::TANK_HIT_AREA; $offsetY++) {
+                    if ($tank->getTankCenterX() + $offsetX === $this->getX() &&
+                        $tank->getTankCenterY() + $offsetY === $this->getY()
+                    ) {
+                        $bulletIntersectionPosition = $this->bulletIntersectionPosition($tank, [$offsetX, $offsetY]);
+                        $bulletTime = $this->getBulletTimeOnPosition($bulletIntersectionPosition);
+                        if ($this->checkTimeIntersection($bulletTime, $tank)) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -135,7 +139,7 @@ class Bullet extends BulletAbstract
     {
         $result = [];
         foreach ($this as $property => $value) {
-            if (in_array($property, BulletAbstract::CLIENT_FIELDS, true)) {
+            if (in_array($property, self::CLIENT_FIELDS, true)) {
                 $result[$property] = $value;
             }
         }
@@ -157,16 +161,16 @@ class Bullet extends BulletAbstract
     {
         $direction = $this->getDirection();
         if ($direction === Canvas::CODE_LEFT_ARROW) {
-            $this->x -= Bullet::BULLET_STEP;
+            $this->x -= self::BULLET_STEP;
         }
         if ($direction === Canvas::CODE_UP_ARROW) {
-            $this->y -= Bullet::BULLET_STEP;
+            $this->y -= self::BULLET_STEP;
         }
         if ($direction === Canvas::CODE_RIGHT_ARROW) {
-            $this->x += Bullet::BULLET_STEP;
+            $this->x += self::BULLET_STEP;
         }
         if ($direction === Canvas::CODE_DOWN_ARROW) {
-            $this->y += Bullet::BULLET_STEP;
+            $this->y += self::BULLET_STEP;
         }
     }
     
@@ -221,17 +225,18 @@ class Bullet extends BulletAbstract
     }
 
     /**
-     * @param Tank $tank
-     * @param int  $offset
+     * @param Tank  $tank
+     * @param array $offset
      *
      * @return int
      */
-    protected function bulletIntersectionPosition(Tank $tank, int $offset): int
+    protected function bulletIntersectionPosition(Tank $tank, array $offset): int
     {
         $direction = $this->getDirection();
-        $position = $tank->getTankCenterX() + $offset;
+        [$offsetX, $offsetY] = $offset;
+        $position = $tank->getTankCenterX() + $offsetX;
         if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
-            $position = $tank->getTankCenterY() + $offset;
+            $position = $tank->getTankCenterY() + $offsetY;
         }
 
         return $position;

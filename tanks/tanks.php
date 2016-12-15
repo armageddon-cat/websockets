@@ -18,6 +18,7 @@
         SIZE_IMAGE = 100;
         SIZE_IMAGE_HALF = SIZE_IMAGE * 0.5;
         SIZE_CANVAS = 800;
+        CANVAS_START = 0;
         CODE_LEFT_ARROW = 37;
         CODE_UP_ARROW = 38;
         CODE_RIGHT_ARROW = 39;
@@ -55,7 +56,6 @@
         var canvas = document.getElementById('canvas');
         var canvasContext = canvas.getContext('2d');
         canvasContext.save();
-        canvasContext.drawImage(img, IMAGE_OFFSET_X, IMAGE_OFFSET_Y);
         setInterval(function () {
             if (buffer != '') {
                 socket.send(buffer);

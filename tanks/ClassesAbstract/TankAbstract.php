@@ -21,9 +21,16 @@ abstract class TankAbstract extends PointAbstract
     public const TANK_STEP = 10;
     public const TANK_SIZE = 100;
     public const TANK_HIT_AREA = 20;
+    public const TANK_LENGTH = 73; // px
+    public const TANK_WIDTH = 36; // px
+    public const TANK_MIDDLE_POINT_LENGTH = self::TANK_LENGTH * 0.5;
+    public const TANK_MIDDLE_POINT_WIDTH = self::TANK_WIDTH * 0.5;
     public const DEAD = 0;
     public const ALIVE = 1;
-    public const TANK_BARREL_OFFSET_VALUE = 60;
+    public const TANK_BARREL_LENGTH = 27;
+    public const TANK_BARREL_OFFSET_VALUE_LENGTH = self::TANK_MIDDLE_POINT_LENGTH + self::TANK_BARREL_LENGTH;
+    public const TANK_PADDING_LEFT_BARREL_UP = 30;
+    public const TANK_PADDING_RIGHT_BARREL_UP = 34;
     public const DEFAULT_TANK_CORS_X = 150;
     public const DEFAULT_TANK_CORS_Y = 150;
     public const DEFAULT_TANK_DIRECTION = Canvas::CODE_UP_ARROW;

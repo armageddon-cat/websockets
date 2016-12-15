@@ -21,9 +21,9 @@ class Tank extends TankAbstract
     public function __construct(\DateTime $time)
     {
         $this->setId(Guid::newRef());
-        $this->setStatus(Tank::ALIVE);
-        $this->setX(self::DEFAULT_TANK_CORS_X);
-        $this->setY(self::DEFAULT_TANK_CORS_X);
+        $this->setStatus(self::ALIVE);
+        $this->setX($this->getRandomRespPoint());
+        $this->setY($this->getRandomRespPoint());
         $this->setDirection(self::DEFAULT_TANK_DIRECTION);
         $this->setTime($time);
         $this->setRoute($this);
@@ -67,7 +67,7 @@ class Tank extends TankAbstract
     {
         $result = [];
         foreach ($this as $property => $value) {
-            if (in_array($property, TankAbstract::CLIENT_FIELDS, true)) {
+            if (in_array($property, self::CLIENT_FIELDS, true)) {
                 $result[$property] = $value;
             }
             if ($value instanceof Bullet) {
@@ -87,7 +87,15 @@ class Tank extends TankAbstract
      */
     public function getTankCenterX(): int
     {
-        return (int)($this->getX() + Tank::TANK_SIZE * 0.5);
+        $direction = $this->getDirection();
+        $center = $this->getX() + self::TANK_LENGTH * 0.5;
+        if ($direction === Canvas::CODE_LEFT_ARROW) {
+            $center += self::TANK_BARREL_LENGTH;
+        }
+        if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
+            $center = $this->getX() + self::TANK_WIDTH * 0.5 + self::TANK_PADDING_LEFT_BARREL_UP;
+        }
+        return (int)$center;
     }
     
     /**
@@ -95,7 +103,16 @@ class Tank extends TankAbstract
      */
     public function getTankCenterY(): int
     {
-        return (int)($this->getY() + Tank::TANK_SIZE * 0.5);
+        $direction = $this->getDirection();
+        $center = $this->getY() + self::TANK_LENGTH * 0.5;
+        if ($direction === Canvas::CODE_UP_ARROW) {
+            $center += self::TANK_BARREL_LENGTH;
+        }
+        if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
+            $center = $this->getY() + self::TANK_WIDTH * 0.5 + self::TANK_PADDING_LEFT_BARREL_UP;
+        }
+
+        return (int)$center;
     }
     
     /**
@@ -109,19 +126,19 @@ class Tank extends TankAbstract
         $offsetValue = 0;
         
         if ($direction === Canvas::CODE_LEFT_ARROW && $type === Canvas::AXIS_X) {
-            $offsetValue = -self::TANK_BARREL_OFFSET_VALUE;
+            $offsetValue = -self::TANK_BARREL_OFFSET_VALUE_LENGTH;
         }
         if ($direction === Canvas::CODE_UP_ARROW && $type === Canvas::AXIS_Y) {
-            $offsetValue = -self::TANK_BARREL_OFFSET_VALUE;
+            $offsetValue = -self::TANK_BARREL_OFFSET_VALUE_LENGTH;
         }
         if ($direction === Canvas::CODE_RIGHT_ARROW && $type === Canvas::AXIS_X) {
-            $offsetValue = self::TANK_BARREL_OFFSET_VALUE;
+            $offsetValue = self::TANK_BARREL_OFFSET_VALUE_LENGTH;
         }
         if ($direction === Canvas::CODE_DOWN_ARROW && $type === Canvas::AXIS_Y) {
-            $offsetValue = self::TANK_BARREL_OFFSET_VALUE;
+            $offsetValue = self::TANK_BARREL_OFFSET_VALUE_LENGTH;
         }
         
-        return $offsetValue;
+        return (int)$offsetValue;
     }
     
     /**
@@ -145,6 +162,14 @@ class Tank extends TankAbstract
      */
     public function isAlive(): bool
     {
-        return $this->getStatus() === TankAbstract::ALIVE;
+        return $this->getStatus() === self::ALIVE;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRandomRespPoint(): int
+    {
+        return random_int(Canvas::CANVAS_START, Canvas::CANVAS_SIZE - self::TANK_SIZE);
     }
 }
