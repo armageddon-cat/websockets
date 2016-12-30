@@ -16,7 +16,7 @@ class Bullet extends BulletAbstract
      *
      * @param ClientMessageContainer $cliMessage
      */
-    public function __construct(ClientMessageContainer $cliMessage)
+    private function __construct(ClientMessageContainer $cliMessage)
     {
         $this->setId($cliMessage->getId());
         $this->setTank(TankRegistry::get($this->getId()));

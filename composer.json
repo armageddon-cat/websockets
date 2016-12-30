@@ -5,7 +5,8 @@
       "WebSocket\\": "",
       "Validators\\": "tanks/Validators/",
       "Exceptions\\": "tanks/Exceptions/",
-      "ClassesAbstract\\": "tanks/ClassesAbstract/"
+      "ClassesAbstract\\": "tanks/ClassesAbstract/",
+      "Tests\\": "tests/"
     }
   },
   "require-dev": {
