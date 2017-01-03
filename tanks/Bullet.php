@@ -201,7 +201,7 @@ class Bullet extends BulletAbstract
     {
         $bTimestamp = (float)$bulletTime->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);
         $tankRoute  = $tank->getRoute();
-        $index      = $tank->getTankCenterX() . TankMoveRoute::COORDINATES_DIVIDER . $tank->getTankCenterY();
+        $index      = $tankRoute->getMoveIndex($tank);
         if ($tankRoute->checkMove($index)) {
             $tankCurrentMove = $tankRoute->getMove($index);
             $tCMTimestamp    = (float)$tankCurrentMove->getTime()->format(DateTimeUser::UNIX_TIMESTAMP_MICROSECONDS);

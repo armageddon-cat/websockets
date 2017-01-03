@@ -22,7 +22,7 @@ class TankMoveRoute
      */
     public function __construct(Tank $tank)
     {
-        $this->storage[$tank->getTankCenterX(). self::COORDINATES_DIVIDER .$tank->getTankCenterY()] = new TankMove($tank);
+        $this->storage[$this->getMoveIndex($tank)] = new TankMove($tank);
     }
     
     /**
@@ -38,7 +38,7 @@ class TankMoveRoute
             reset($this->storage);
             unset($this->storage[key($this->storage)]);
         }
-        $this->storage[$tank->getTankCenterX(). self::COORDINATES_DIVIDER .$tank->getTankCenterY()] = new TankMove($tank);
+        $this->storage[$this->getMoveIndex($tank)] = new TankMove($tank);
     }
     
     /**
@@ -91,5 +91,15 @@ class TankMoveRoute
     public function unsetStorage(): void
     {
         $this->storage = [];
+    }
+
+    /**
+     * @param Tank $tank
+     *
+     * @return string
+     */
+    public function getMoveIndex(Tank $tank): string
+    {
+        return $tank->getTankCenterX() . self::COORDINATES_DIVIDER . $tank->getTankCenterY();
     }
 }
