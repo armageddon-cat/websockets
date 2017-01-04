@@ -46,7 +46,9 @@ class TankSimpleTest extends PHPUnit_Framework_TestCase
 
     public function testGetRandomRespPoint(): void
     {
-        $this->assertContains($this->tank->getRandomRespPoint(), range(Canvas::CANVAS_START, Canvas::CANVAS_SIZE - Tank::TANK_SIZE));
+        $this->assertContains(
+            $this->tank->getRandomRespPoint(),
+            range(Canvas::CANVAS_START, Canvas::CANVAS_SIZE - Tank::TANK_SIZE));
     }
 
     public function testGetTankBarrelX(): void

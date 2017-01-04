@@ -31,35 +31,25 @@ class Tank extends TankAbstract
     
     /**
      * @param \DateTime $moveTime
+     *
+     * @return void
      */
     public function moveTank(\DateTime $moveTime): void
     {
         $this->setTime($moveTime);
-        $direction = $this->getDirection();
-        if ($direction === Canvas::CODE_LEFT_ARROW) {
-            $this->x -= self::TANK_STEP;
-        }
-        if ($direction === Canvas::CODE_UP_ARROW) {
-            $this->y -= self::TANK_STEP;
-        }
-        if ($direction === Canvas::CODE_RIGHT_ARROW) {
-            $this->x += self::TANK_STEP;
-        }
-        if ($direction === Canvas::CODE_DOWN_ARROW) {
-            $this->y += self::TANK_STEP;
-        }
+        $this->changeCoordinates();
         $this->getRoute()->addMove($this);
     }
     
     /**
      * Fields send to client
-     * id
-     * direction
-     * x
-     * y
-     * bullet
-     * bullet.x
-     * bullet.y
+     * 1 id
+     * 2 direction
+     * 3 x
+     * 4 y
+     * if bullet exists:
+     * 5 bullet.x
+     * 6 bullet.y
      *
      * @return string
      */
@@ -76,7 +66,10 @@ class Tank extends TankAbstract
         }
         return json_encode($result);
     }
-    
+
+    /**
+     * @return void
+     */
     public function unsetBullet(): void
     {
         unset($this->bullet);
@@ -87,15 +80,17 @@ class Tank extends TankAbstract
      */
     public function getTankCenterX(): int
     {
-        $direction = $this->getDirection();
-        $center = $this->getX() + self::TANK_LENGTH * 0.5;
-        if ($direction === Canvas::CODE_LEFT_ARROW) {
-            $center += self::TANK_BARREL_LENGTH;
+        switch ($this->getDirection()) {
+            case Canvas::CODE_RIGHT_ARROW:
+                return $this->getX() + self::getTankWidthHalf();
+            case Canvas::CODE_LEFT_ARROW:
+                return $this->getX() + self::getTankWidthHalf() + self::TANK_BARREL_LENGTH;
+            case Canvas::CODE_UP_ARROW:
+            case Canvas::CODE_DOWN_ARROW:
+                return $this->getX() + self::getTankWidthHalf() + self::TANK_PADDING_LEFT_BARREL_UP;
+            default:
+                return 0; // todo exceptional case. maybe some work here in future
         }
-        if ($direction === Canvas::CODE_UP_ARROW || $direction === Canvas::CODE_DOWN_ARROW) {
-            $center = $this->getX() + self::TANK_WIDTH * 0.5 + self::TANK_PADDING_LEFT_BARREL_UP;
-        }
-        return (int)$center;
     }
     
     /**
@@ -103,16 +98,17 @@ class Tank extends TankAbstract
      */
     public function getTankCenterY(): int
     {
-        $direction = $this->getDirection();
-        $center = $this->getY() + self::TANK_LENGTH * 0.5;
-        if ($direction === Canvas::CODE_UP_ARROW) {
-            $center += self::TANK_BARREL_LENGTH;
+        switch ($this->getDirection()) {
+            case Canvas::CODE_DOWN_ARROW:
+                return $this->getY() + self::getTankWidthHalf();
+            case Canvas::CODE_UP_ARROW:
+                return $this->getY() + self::getTankWidthHalf() + self::TANK_BARREL_LENGTH;
+            case Canvas::CODE_LEFT_ARROW:
+            case Canvas::CODE_RIGHT_ARROW:
+                return $this->getY() + self::getTankWidthHalf() + self::TANK_PADDING_LEFT_BARREL_UP;
+            default:
+                return 0; // todo exceptional case. maybe some work here in future
         }
-        if ($direction === Canvas::CODE_LEFT_ARROW || $direction === Canvas::CODE_RIGHT_ARROW) {
-            $center = $this->getY() + self::TANK_WIDTH * 0.5 + self::TANK_PADDING_LEFT_BARREL_UP;
-        }
-
-        return (int)$center;
     }
     
     /**
@@ -171,5 +167,74 @@ class Tank extends TankAbstract
     public function getRandomRespPoint(): int
     {
         return random_int(Canvas::CANVAS_START, Canvas::CANVAS_SIZE - self::TANK_SIZE);
+    }
+
+    /**
+     * @return void
+     */
+    private function changeCoordinates(): void
+    {
+        switch ($this->getDirection()) {
+            case Canvas::CODE_LEFT_ARROW:
+                $this->decrementXByStep();
+                break;
+            case Canvas::CODE_UP_ARROW:
+                $this->decrementYByStep();
+                break;
+            case Canvas::CODE_RIGHT_ARROW:
+                $this->incrementXByStep();
+                break;
+            case Canvas::CODE_DOWN_ARROW:
+                $this->incrementYByStep();
+                break;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function decrementXByStep(): void
+    {
+        $this->x -= self::TANK_STEP;
+    }
+
+    /**
+     * @return void
+     */
+    private function decrementYByStep(): void
+    {
+        $this->y -= self::TANK_STEP;
+    }
+
+    /**
+     * @return void
+     */
+    private function incrementXByStep(): void
+    {
+        $this->x += self::TANK_STEP;
+    }
+
+    /**
+     * @return void
+     */
+    private function incrementYByStep(): void
+    {
+        $this->y += self::TANK_STEP;
+    }
+
+    /**
+     * @return int
+     */
+    public static function getTankWidthHalf(): int
+    {
+        return (int)(self::TANK_WIDTH * 0.5);
+    }
+
+    /**
+     * @return int
+     */
+    public static function getTankLengthHalf(): int
+    {
+        return (int)(self::TANK_LENGTH * 0.5);
     }
 }
