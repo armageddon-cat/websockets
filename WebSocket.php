@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace WebSocket;
 
 /**
- * Class WebSocket
+ * Class WebSocket tets
  * @package WebSocket
  */
 class WebSocket
